@@ -11,6 +11,9 @@
         background-color: $light;
         color: $dark;
     }
+    #signUp {
+        max-width: 35rem;
+    }
 }
 
 @import "../node_modules/bootstrap/scss/bootstrap.scss";
