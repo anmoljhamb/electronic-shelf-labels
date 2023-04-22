@@ -1,5 +1,12 @@
+import { Button } from "react-bootstrap";
+import { SignUp } from ".";
+
 function App() {
-    return <h1>This is my new app hey!</h1>;
+    return (
+        <>
+            <SignUp />
+        </>
+    );
 }
 
 export default App;

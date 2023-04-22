@@ -1,0 +1,16 @@
+@import "./variables.scss";
+
+#root {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow-y: auto;
+    background-color: $dark;
+    .container {
+        background-color: $light;
+        color: $dark;
+    }
+}
+
+@import "../node_modules/bootstrap/scss/bootstrap.scss";
