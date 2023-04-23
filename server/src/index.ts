@@ -3,12 +3,13 @@ import express, { Request, Response } from "express";
 const app = express();
 const port = process.env.PORT || 8080;
 
-app.get("/", (_req: Request, res: Response) => {
+app.get("/", (req: Request, res: Response) => {
     return res.send("Express Typescript on Vercel");
 });
 
-app.get("/ping", (_req: Request, res: Response) => {
-    return res.send("pong 🏓");
+app.get("/register", (req, res) => {
+    console.log(req.query);
+    res.status(200).json({ message: "Ok" });
 });
 
 app.listen(port, () => {
