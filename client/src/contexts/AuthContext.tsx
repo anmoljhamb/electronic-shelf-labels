@@ -5,6 +5,9 @@ import {
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
     signOut,
+    updateCurrentUser,
+    updateEmail,
+    updatePassword,
 } from "firebase/auth";
 import { AuthContextInterface } from "../types";
 
@@ -39,6 +42,14 @@ export const AuthProvider = ({ children }: PropsInterface) => {
         return signOut(auth);
     };
 
+    const updateUserEmail = (email: string) => {
+        return updateEmail(currentUser as User, email);
+    };
+
+    const updateUserPassword = (password: string) => {
+        return updatePassword(currentUser as User, password);
+    };
+
     return (
         <AuthContext.Provider
             value={{
@@ -46,6 +57,8 @@ export const AuthProvider = ({ children }: PropsInterface) => {
                 signUp,
                 logIn,
                 logOut,
+                updateUserEmail,
+                updateUserPassword,
             }}
         >
             {!loading && children}

@@ -5,4 +5,6 @@ export interface AuthContextInterface {
     signUp(email: string, password: string): Promise<UserCredential>;
     logIn(email: string, password: string): Promise<UserCredential>;
     logOut(): Promise<void>;
+    updateUserEmail(email: string): Promise<void>;
+    updateUserPassword(password: string): Promise<void>;
 }
