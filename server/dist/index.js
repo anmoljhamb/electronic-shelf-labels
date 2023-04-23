@@ -41,7 +41,6 @@ app.get("/setPrice", (req, res) => {
 app.get("/getPrice", (req, res) => {
     let { productId } = req.query;
     productId = productId;
-    console.log(data);
     if (productId in data) {
         if (data[productId].length >= 2) {
             let lastValue = data[productId].at(-1).price;
@@ -49,12 +48,12 @@ app.get("/getPrice", (req, res) => {
             lastValue = Number.parseFloat(lastValue);
             secondLast = Number.parseFloat(secondLast);
             if (lastValue > secondLast) {
-                return res.send(`${lastValue}`);
+                return res.send(`1${lastValue}`);
             }
-            return res.send(`${lastValue} ${secondLast}`);
+            return res.send(`2${lastValue} ${secondLast}`);
         }
         else {
-            return res.send(data[productId].at(-1));
+            return res.send(`1${data[productId].at(-1)}`);
         }
     }
     return res.send("Not Found");
