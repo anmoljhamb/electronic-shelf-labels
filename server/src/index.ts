@@ -1,20 +1,21 @@
 import express, { Request, Response } from "express";
 import path from "path";
 import fs from "fs";
+import { DataInterface } from "./types";
 
 const app = express();
 const port = process.env.PORT || 8080;
 const FILENAME = "data.json";
 
-const loadJSON = (fileName: string) => {
+const loadJSON = (fileName: string): DataInterface => {
     return JSON.parse(
         fs.readFileSync(path.join(__dirname, "..", fileName), "utf-8")
     );
 };
 
-let data: any = loadJSON(FILENAME);
+let data: DataInterface = loadJSON(FILENAME);
 
-const saveJSON = (fileName: string, data: any) => {
+const saveJSON = (fileName: string, data: DataInterface) => {
     fs.writeFileSync(
         path.join(__dirname, "..", fileName),
         JSON.stringify(data)
@@ -33,6 +34,7 @@ app.get("/register", (req, res) => {
 app.get("/setPrice", (req, res) => {
     let { productId, price } = req.query;
     productId = productId as string;
+    price = price as string;
 
     let _data = loadJSON(FILENAME);
     _data = { ..._data };

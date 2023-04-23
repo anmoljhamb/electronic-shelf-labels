@@ -26,6 +26,7 @@ app.get("/register", (req, res) => {
 app.get("/setPrice", (req, res) => {
     let { productId, price } = req.query;
     productId = productId;
+    price = price;
     let _data = loadJSON(FILENAME);
     _data = Object.assign({}, _data);
     if (productId in _data) {
