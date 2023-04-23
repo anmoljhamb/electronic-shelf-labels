@@ -1,11 +1,11 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import { auth } from "../firebase";
 import {
     User,
     createUserWithEmailAndPassword,
+    sendPasswordResetEmail,
     signInWithEmailAndPassword,
     signOut,
-    updateCurrentUser,
     updateEmail,
     updatePassword,
 } from "firebase/auth";
@@ -50,6 +50,10 @@ export const AuthProvider = ({ children }: PropsInterface) => {
         return updatePassword(currentUser as User, password);
     };
 
+    const forgotPassword = (email: string) => {
+        return sendPasswordResetEmail(auth, email);
+    };
+
     return (
         <AuthContext.Provider
             value={{
@@ -59,6 +63,7 @@ export const AuthProvider = ({ children }: PropsInterface) => {
                 logOut,
                 updateUserEmail,
                 updateUserPassword,
+                forgotPassword,
             }}
         >
             {!loading && children}
