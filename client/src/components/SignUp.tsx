@@ -1,5 +1,12 @@
 import React, { ChangeEvent, FormEvent, useContext, useState } from "react";
-import { Button, Container, FloatingLabel, Form, Row } from "react-bootstrap";
+import {
+    Alert,
+    Button,
+    Container,
+    FloatingLabel,
+    Form,
+    Row,
+} from "react-bootstrap";
 import { AuthContext } from "../contexts/AuthContext";
 import { AuthContextInterface } from "../types";
 
@@ -7,20 +14,33 @@ const SignUp = () => {
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
     const [cpassword, setCpassword] = useState<string>("");
-    const [errorMsg, setErrorMsg] = useState<string>("");
+    const [message, setMessage] = useState<string>("");
+    const [messageType, setMessageType] = useState<string>("danger");
     const [loading, setLoading] = useState<boolean>(false);
     const authContext = useContext(AuthContext);
     const { signUp } = authContext as AuthContextInterface;
 
-    const handleOnSubmit = (e: FormEvent) => {
+    const handleOnSubmit = async (e: FormEvent) => {
         e.preventDefault();
         setLoading(true);
 
         if (password !== cpassword) {
             setLoading(false);
-            setErrorMsg("The password's do not match.");
+            setMessage("The password's do not match.");
             return;
         }
+
+        try {
+            setMessage("");
+            setLoading(true);
+            await signUp(email, password);
+            setMessage("User created Successfully!");
+            setMessageType("info");
+        } catch {
+            setMessage("Failed to create the account.");
+        }
+
+        setLoading(false);
     };
 
     return (
@@ -63,6 +83,18 @@ const SignUp = () => {
                             required
                         />
                     </FloatingLabel>
+                    {message.length > 0 && (
+                        <Row className="m-2 mb-0">
+                            <Alert
+                                show={message.length > 0}
+                                onClose={() => setMessage("")}
+                                dismissible
+                                variant={messageType}
+                            >
+                                {message}
+                            </Alert>
+                        </Row>
+                    )}
                     <Button
                         type="submit"
                         className="w-100 m-2"

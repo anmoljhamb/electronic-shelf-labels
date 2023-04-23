@@ -17,10 +17,12 @@ export const AuthProvider = ({ children }: PropsInterface) => {
     const [currentUser, setCurrentUser] = useState<
         UserCredential | User | null
     >(null);
+    const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged((user) => {
             setCurrentUser(user);
+            setLoading(false);
         });
 
         return unsubscribe;
@@ -37,7 +39,7 @@ export const AuthProvider = ({ children }: PropsInterface) => {
                 signUp,
             }}
         >
-            {children}
+            {!loading && children}
         </AuthContext.Provider>
     );
 };
