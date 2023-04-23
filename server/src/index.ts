@@ -65,8 +65,8 @@ app.get("/getPrice", (req, res) => {
                 return res.send(`1${lastValue}`);
             }
 
-            let temp = 16 - lastValueStr.length - secondLastStr.length;
-            return res.send(`2${lastValue}${" ".repeat(temp)}${secondLast}`);
+            let temp = 16 - lastValueStr.length - secondLastStr.length - 2;
+            return res.send(`2$${secondLast}${" ".repeat(temp)}$${lastValue}`);
         } else {
             return res.send(`1${data[productId].at(-1)}`);
         }
