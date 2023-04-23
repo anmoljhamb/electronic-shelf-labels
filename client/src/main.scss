@@ -25,6 +25,10 @@
         right: 0;
         bottom: auto;
     }
+    #cardContainer {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+    }
 }
 
 // @import "../node_modules/bootstrap/scss/bootstrap.scss";

@@ -9,3 +9,14 @@ export interface AuthContextInterface {
     updateUserPassword(password: string): Promise<void>;
     forgotPassword(email: string): Promise<void>;
 }
+
+export interface ProductInterface {
+    productId: string;
+    price: string;
+    desc: string;
+    title: string;
+}
+
+export interface DevicesInterface {
+    [key: string]: ProductInterface;
+}

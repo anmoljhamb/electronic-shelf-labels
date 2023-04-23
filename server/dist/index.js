@@ -42,7 +42,7 @@ app.get("/register", (req, res) => {
     res.status(200).json({ message: "Ok" });
 });
 app.get("/getDevices", (req, res) => {
-    res.status(200).json({ devices: Object.keys(data) });
+    res.status(200).json(devices);
 });
 app.get("/setPrice", (req, res) => {
     let { productId, price } = req.query;
