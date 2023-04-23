@@ -1,6 +1,6 @@
-import { Auth, User, UserCredential } from "firebase/auth";
+import { User, UserCredential } from "firebase/auth";
 
-export interface AuthContext {
+export interface AuthContextInterface {
     currentUser: UserCredential | null | User;
     signUp(email: string, password: string): Promise<UserCredential>;
 }

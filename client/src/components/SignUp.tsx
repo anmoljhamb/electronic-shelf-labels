@@ -1,15 +1,26 @@
-import React, { ChangeEvent, FormEvent, useState } from "react";
+import React, { ChangeEvent, FormEvent, useContext, useState } from "react";
 import { Button, Container, FloatingLabel, Form, Row } from "react-bootstrap";
+import { AuthContext } from "../contexts/AuthContext";
+import { AuthContextInterface } from "../types";
 
 const SignUp = () => {
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
     const [cpassword, setCpassword] = useState<string>("");
+    const [errorMsg, setErrorMsg] = useState<string>("");
     const [loading, setLoading] = useState<boolean>(false);
+    const authContext = useContext(AuthContext);
+    const { signUp } = authContext as AuthContextInterface;
 
     const handleOnSubmit = (e: FormEvent) => {
         e.preventDefault();
         setLoading(true);
+
+        if (password !== cpassword) {
+            setLoading(false);
+            setErrorMsg("The password's do not match.");
+            return;
+        }
     };
 
     return (

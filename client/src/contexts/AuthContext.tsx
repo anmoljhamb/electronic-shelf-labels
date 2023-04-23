@@ -5,17 +5,13 @@ import {
     UserCredential,
     createUserWithEmailAndPassword,
 } from "firebase/auth";
-import { AuthContext } from "../types";
+import { AuthContextInterface } from "../types";
 
 interface PropsInterface {
     children: React.ReactNode;
 }
 
-const AuthConext = createContext<AuthContext | null>(null);
-
-export const useAuth = () => {
-    return useContext(AuthConext);
-};
+export const AuthContext = createContext<AuthContextInterface | null>(null);
 
 export const AuthProvider = ({ children }: PropsInterface) => {
     const [currentUser, setCurrentUser] = useState<
@@ -35,13 +31,13 @@ export const AuthProvider = ({ children }: PropsInterface) => {
     };
 
     return (
-        <AuthConext.Provider
+        <AuthContext.Provider
             value={{
                 currentUser,
                 signUp,
             }}
         >
             {children}
-        </AuthConext.Provider>
+        </AuthContext.Provider>
     );
 };
