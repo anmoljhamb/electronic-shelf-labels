@@ -2,7 +2,6 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { auth } from "../firebase";
 import {
     User,
-    UserCredential,
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
     signOut,
@@ -16,9 +15,7 @@ interface PropsInterface {
 export const AuthContext = createContext<AuthContextInterface | null>(null);
 
 export const AuthProvider = ({ children }: PropsInterface) => {
-    const [currentUser, setCurrentUser] = useState<
-        UserCredential | User | null
-    >(null);
+    const [currentUser, setCurrentUser] = useState<User | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
