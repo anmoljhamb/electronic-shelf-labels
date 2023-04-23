@@ -88,6 +88,7 @@ const LogIn = () => {
                             </Alert>
                         </Row>
                     )}
+                    <Link to={"/forgot-password"}>Forgot Password?</Link>
                     <Button
                         type="submit"
                         className="w-100 m-2"

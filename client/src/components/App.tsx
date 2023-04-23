@@ -1,5 +1,5 @@
 import { Button } from "react-bootstrap";
-import { Dashboard, SignUp, UpdateProfile } from ".";
+import { Dashboard, ForgotPassword, SignUp, UpdateProfile } from ".";
 import { Navigate, Route, Routes } from "react-router-dom";
 import LogIn from "./Login";
 import { useContext } from "react";
@@ -31,6 +31,7 @@ function App() {
                 />
                 <Route path="/signup" element={<SignUp />} />
                 <Route path="/login" element={<LogIn />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
             </Routes>
         </>
     );
