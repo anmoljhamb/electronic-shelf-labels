@@ -9,7 +9,7 @@ import {
 } from "react-bootstrap";
 import { AuthContext } from "../contexts/AuthContext";
 import { AuthContextInterface } from "../types";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const SignUp = () => {
     const [email, setEmail] = useState<string>("");
@@ -20,6 +20,8 @@ const SignUp = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const authContext = useContext(AuthContext);
     const { signUp } = authContext as AuthContextInterface;
+
+    const navigator = useNavigate();
 
     const handleOnSubmit = async (e: FormEvent) => {
         e.preventDefault();
@@ -35,8 +37,13 @@ const SignUp = () => {
             setMessage("");
             setLoading(true);
             await signUp(email, password);
-            setMessage("User created Successfully!");
+            setMessage(
+                "User created Successfully! You'll be redirected in a couple of seconds. Please wait."
+            );
             setMessageType("info");
+            setTimeout(() => {
+                navigator("/");
+            }, 3000);
         } catch {
             setMessage("Failed to create the account.");
         }

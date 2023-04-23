@@ -9,7 +9,7 @@ import {
 } from "react-bootstrap";
 import { AuthContext } from "../contexts/AuthContext";
 import { AuthContextInterface } from "../types";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const LogIn = () => {
     const [email, setEmail] = useState<string>("");
@@ -20,6 +20,8 @@ const LogIn = () => {
     const authContext = useContext(AuthContext);
     const { logIn } = authContext as AuthContextInterface;
 
+    const navigator = useNavigate();
+
     const handleOnSubmit = async (e: FormEvent) => {
         e.preventDefault();
         setLoading(true);
@@ -28,10 +30,18 @@ const LogIn = () => {
             setMessage("");
             setLoading(true);
             await logIn(email, password);
-            setMessage("User created Successfully!");
+            setMessage(
+                "User Logged in successfully! You'll be redirected in a couple of seconds."
+            );
             setMessageType("info");
+            setTimeout(() => {
+                navigator("/");
+            }, 3000);
         } catch {
-            setMessage("Failed to create the account.");
+            setMessage(
+                "Failed to login to the account. Please check your credentials."
+            );
+            setMessageType("warning");
         }
 
         setLoading(false);
@@ -83,13 +93,13 @@ const LogIn = () => {
                         className="w-100 m-2"
                         disabled={loading}
                     >
-                        Sign Up
+                        Log In
                     </Button>
                 </Form>
                 <Row>
                     <h6>
-                        If you have an account already, then{" "}
-                        <Link to="/login">Log In</Link>
+                        If you don't have an account already, then{" "}
+                        <Link to="/signup">Sign Up</Link>
                     </h6>
                 </Row>
             </Container>

@@ -5,6 +5,7 @@ import {
     UserCredential,
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
+    signOut,
 } from "firebase/auth";
 import { AuthContextInterface } from "../types";
 
@@ -37,12 +38,17 @@ export const AuthProvider = ({ children }: PropsInterface) => {
         return signInWithEmailAndPassword(auth, email, password);
     };
 
+    const logOut = () => {
+        return signOut(auth);
+    };
+
     return (
         <AuthContext.Provider
             value={{
                 currentUser,
                 signUp,
                 logIn,
+                logOut,
             }}
         >
             {!loading && children}
