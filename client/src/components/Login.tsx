@@ -9,6 +9,7 @@ import {
 } from "react-bootstrap";
 import { AuthContext } from "../contexts/AuthContext";
 import { AuthContextInterface } from "../types";
+import { Link } from "react-router-dom";
 
 const LogIn = () => {
     const [email, setEmail] = useState<string>("");
@@ -88,7 +89,7 @@ const LogIn = () => {
                 <Row>
                     <h6>
                         If you have an account already, then{" "}
-                        <a href="/login">Log In</a>
+                        <Link to="/login">Log In</Link>
                     </h6>
                 </Row>
             </Container>
