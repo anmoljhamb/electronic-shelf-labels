@@ -34,14 +34,14 @@ app.get("/setPrice", (req, res) => {
     data = { ...data };
 
     if (productId in data) {
-        data[productId].push(price);
+        data[productId].push({ price, time: new Date().toISOString() });
     } else {
-        data[productId] = [price];
+        data[productId] = [{ price, time: new Date().toISOString() }];
     }
 
     saveJSON("data.json", data);
 
-    return res.status(200).json({ message: "Working." });
+    return res.status(200).json({ message: "Ok" });
 });
 
 app.listen(port, () => {
