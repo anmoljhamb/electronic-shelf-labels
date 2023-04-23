@@ -86,6 +86,7 @@ const SignUp = () => {
                             onChange={(e: ChangeEvent<HTMLInputElement>) => {
                                 setPassword(e.target.value);
                             }}
+                            autoComplete="off"
                         />
                         <Form.Text>
                             Leave the passwords empty to keep it same
@@ -99,6 +100,7 @@ const SignUp = () => {
                             onChange={(e: ChangeEvent<HTMLInputElement>) => {
                                 setCpassword(e.target.value);
                             }}
+                            autoComplete="off"
                         />
                         <Form.Text>
                             Leave the passwords empty to keep it same
