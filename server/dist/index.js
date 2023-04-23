@@ -6,6 +6,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
+const morgan_1 = __importDefault(require("morgan"));
+const cors_1 = __importDefault(require("cors"));
 const app = (0, express_1.default)();
 const port = process.env.PORT || 8080;
 const FILENAME = "data.json";
@@ -13,15 +15,34 @@ const loadJSON = (fileName) => {
     return JSON.parse(fs_1.default.readFileSync(path_1.default.join(__dirname, "..", fileName), "utf-8"));
 };
 let data = loadJSON(FILENAME);
+let devices = loadJSON("devices.json");
 const saveJSON = (fileName, data) => {
     fs_1.default.writeFileSync(path_1.default.join(__dirname, "..", fileName), JSON.stringify(data));
 };
+app.use((0, morgan_1.default)("dev"));
+app.use((0, cors_1.default)());
 app.get("/", (req, res) => {
     return res.send("Express Typescript on Vercel");
 });
 app.get("/register", (req, res) => {
     console.log(req.query);
+    if (!("devices" in devices)) {
+        let { productId } = req.query;
+        productId = productId;
+        if (!(productId in devices)) {
+            devices[productId] = {
+                desc: "",
+                price: "",
+                productId,
+                title: "",
+            };
+            saveJSON("devices.json", devices);
+        }
+    }
     res.status(200).json({ message: "Ok" });
+});
+app.get("/getDevices", (req, res) => {
+    res.status(200).json({ devices: Object.keys(data) });
 });
 app.get("/setPrice", (req, res) => {
     let { productId, price } = req.query;
@@ -34,6 +55,9 @@ app.get("/setPrice", (req, res) => {
     }
     else {
         _data[productId] = [{ price, time: new Date().toISOString() }];
+    }
+    if (productId in devices) {
+        devices[productId].price = price;
     }
     saveJSON(FILENAME, _data);
     data = _data;

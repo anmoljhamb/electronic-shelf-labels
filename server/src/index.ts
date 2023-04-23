@@ -1,26 +1,32 @@
 import express, { Request, Response } from "express";
 import path from "path";
 import fs from "fs";
-import { DataInterface } from "./types";
+import { DataInterface, DevicesInterface, ProductInterface } from "./types";
+import morgan from "morgan";
+import cors from "cors";
 
 const app = express();
 const port = process.env.PORT || 8080;
 const FILENAME = "data.json";
 
-const loadJSON = (fileName: string): DataInterface => {
+const loadJSON = (fileName: string): DataInterface | DevicesInterface => {
     return JSON.parse(
         fs.readFileSync(path.join(__dirname, "..", fileName), "utf-8")
     );
 };
 
-let data: DataInterface = loadJSON(FILENAME);
+let data: DataInterface = loadJSON(FILENAME) as DataInterface;
+let devices: DevicesInterface = loadJSON("devices.json") as DevicesInterface;
 
-const saveJSON = (fileName: string, data: DataInterface) => {
+const saveJSON = (fileName: string, data: DataInterface | DevicesInterface) => {
     fs.writeFileSync(
         path.join(__dirname, "..", fileName),
         JSON.stringify(data)
     );
 };
+
+app.use(morgan("dev"));
+app.use(cors());
 
 app.get("/", (req: Request, res: Response) => {
     return res.send("Express Typescript on Vercel");
@@ -28,7 +34,24 @@ app.get("/", (req: Request, res: Response) => {
 
 app.get("/register", (req, res) => {
     console.log(req.query);
+    if (!("devices" in devices)) {
+        let { productId } = req.query;
+        productId = productId as string;
+        if (!(productId in devices)) {
+            devices[productId] = {
+                desc: "",
+                price: "",
+                productId,
+                title: "",
+            };
+            saveJSON("devices.json", devices);
+        }
+    }
     res.status(200).json({ message: "Ok" });
+});
+
+app.get("/getDevices", (req, res) => {
+    res.status(200).json({ devices: Object.keys(data) });
 });
 
 app.get("/setPrice", (req, res) => {
@@ -36,13 +59,17 @@ app.get("/setPrice", (req, res) => {
     productId = productId as string;
     price = price as string;
 
-    let _data = loadJSON(FILENAME);
+    let _data = loadJSON(FILENAME) as DataInterface;
     _data = { ..._data };
 
     if (productId in _data) {
         _data[productId].push({ price, time: new Date().toISOString() });
     } else {
         _data[productId] = [{ price, time: new Date().toISOString() }];
+    }
+
+    if (productId in devices) {
+        devices[productId].price = price;
     }
 
     saveJSON(FILENAME, _data);
