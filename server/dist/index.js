@@ -43,14 +43,15 @@ app.get("/getPrice", (req, res) => {
     productId = productId;
     if (productId in data) {
         if (data[productId].length >= 2) {
-            let lastValue = data[productId].at(-1).price;
-            let secondLast = data[productId].at(-2).price;
-            lastValue = Number.parseFloat(lastValue);
-            secondLast = Number.parseFloat(secondLast);
-            if (lastValue > secondLast) {
+            let lastValueStr = data[productId].at(-1).price;
+            let secondLastStr = data[productId].at(-2).price;
+            let lastValue = Number.parseFloat(lastValueStr);
+            let secondLast = Number.parseFloat(secondLastStr);
+            if (lastValue >= secondLast) {
                 return res.send(`1${lastValue}`);
             }
-            return res.send(`2${lastValue} ${secondLast}`);
+            let temp = 16 - lastValueStr.length - secondLastStr.length;
+            return res.send(`2${lastValue}${" ".repeat(temp)}${secondLast}`);
         }
         else {
             return res.send(`1${data[productId].at(-1)}`);
