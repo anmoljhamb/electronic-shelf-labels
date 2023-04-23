@@ -4,6 +4,7 @@ import {
     User,
     UserCredential,
     createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
 } from "firebase/auth";
 import { AuthContextInterface } from "../types";
 
@@ -32,11 +33,16 @@ export const AuthProvider = ({ children }: PropsInterface) => {
         return createUserWithEmailAndPassword(auth, email, password);
     };
 
+    const logIn = (email: string, password: string) => {
+        return signInWithEmailAndPassword(auth, email, password);
+    };
+
     return (
         <AuthContext.Provider
             value={{
                 currentUser,
                 signUp,
+                logIn,
             }}
         >
             {!loading && children}
