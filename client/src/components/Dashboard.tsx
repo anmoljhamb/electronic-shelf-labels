@@ -1,9 +1,13 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Button, Card, Col, Container, Row } from "react-bootstrap";
 import { AuthContext } from "../contexts/AuthContext";
-import { AuthContextInterface, DevicesInterface } from "../types";
+import {
+    AuthContextInterface,
+    DevicesInterface,
+    ProductInterface,
+} from "../types";
 import { useNavigate } from "react-router-dom";
-import { NavbarComponent } from ".";
+import { DeviceDetails, NavbarComponent } from ".";
 import axios from "axios";
 import { BACKEND_URI } from "../constants";
 
@@ -12,7 +16,9 @@ const Dashboard = () => {
     const { currentUser } = authContext;
     const navigator = useNavigate();
     const [loading, setLoading] = useState<boolean>(true);
+    const [modalShow, setModalShow] = useState<boolean>(false);
     const [devices, setDevices] = useState<DevicesInterface>({});
+    const [showDevice, setShowDevice] = useState<ProductInterface | null>(null);
 
     useEffect(() => {
         axios
@@ -29,7 +35,8 @@ const Dashboard = () => {
 
     const handleViewCard = (key: string) => {
         const _util = () => {
-            console.log(key);
+            setModalShow(true);
+            setShowDevice(devices[key]);
         };
         return _util;
     };
@@ -37,6 +44,11 @@ const Dashboard = () => {
     return (
         <>
             <NavbarComponent />
+            <DeviceDetails
+                onHide={() => setModalShow(false)}
+                show={modalShow}
+                device={showDevice as ProductInterface}
+            />
             <Container
                 className="p-3"
                 style={{ width: "100% !important", height: "40rem" }}
