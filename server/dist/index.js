@@ -47,6 +47,7 @@ app.get("/getDevices", (req, res) => {
 });
 app.post("/setDevice", (req, res) => {
     let { productId, price, desc, title } = req.body;
+    price = price.toString();
     if (productId in devices) {
         devices[productId] = { productId, price, desc, title };
         saveJSON("devices.json", devices);
@@ -88,6 +89,7 @@ app.get("/getPrice", (req, res) => {
             let secondLastStr = data[productId].at(-2).price;
             let lastValue = Number.parseFloat(lastValueStr);
             let secondLast = Number.parseFloat(secondLastStr);
+            console.log(lastValue);
             if (lastValue >= secondLast) {
                 return res.send(`1${lastValue}`);
             }
@@ -95,7 +97,7 @@ app.get("/getPrice", (req, res) => {
             return res.send(`2$${secondLast}${" ".repeat(temp)}$${lastValue}`);
         }
         else {
-            return res.send(`1${data[productId].at(-1)}`);
+            return res.send(`1${data[productId].at(-1).price}`);
         }
     }
     return res.send("Not Found");

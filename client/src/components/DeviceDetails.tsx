@@ -91,8 +91,8 @@ const DeviceDetails = (props: PropsInterface) => {
                                     <td>{desc}</td>
                                 </tr>
                                 <tr>
-                                    <th>Desc</th>
-                                    <td>{desc}</td>
+                                    <th>Product Id</th>
+                                    <td>{props.device.productId}</td>
                                 </tr>
                             </tbody>
                         </Table>

@@ -22,6 +22,6 @@
     "scripts": {
         "start": "tsc && node dist/index.js",
         "build": "tsc",
-        "dev": "concurrently -k \"tsc --watch\" \"nodemon ./dist/index -e js,env\""
+        "dev": "concurrently -k \"tsc --watch\" \"nodemon ./dist/index -e js,env,json\""
     }
 }
