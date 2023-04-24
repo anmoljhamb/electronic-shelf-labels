@@ -21,6 +21,7 @@ const saveJSON = (fileName, data) => {
 };
 app.use((0, morgan_1.default)("dev"));
 app.use((0, cors_1.default)());
+app.use(express_1.default.json());
 app.get("/", (req, res) => {
     return res.send("Express Typescript on Vercel");
 });
@@ -43,6 +44,21 @@ app.get("/register", (req, res) => {
 });
 app.get("/getDevices", (req, res) => {
     res.status(200).json(devices);
+});
+app.post("/setDevice", (req, res) => {
+    let { productId, price, desc, title } = req.body;
+    if (productId in devices) {
+        devices[productId] = { productId, price, desc, title };
+        saveJSON("devices.json", devices);
+    }
+    if (productId in data) {
+        data[productId].push({ price, time: new Date().toISOString() });
+    }
+    else {
+        data[productId] = [{ price, time: new Date().toISOString() }];
+    }
+    saveJSON("data.json", data);
+    res.status(200).json(Object.assign({}, req.body));
 });
 app.get("/setPrice", (req, res) => {
     let { productId, price } = req.query;

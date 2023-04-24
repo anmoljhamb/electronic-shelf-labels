@@ -16,6 +16,7 @@ const Dashboard = () => {
     const { currentUser } = authContext;
     const navigator = useNavigate();
     const [loading, setLoading] = useState<boolean>(true);
+    const [updated, setUpdated] = useState<boolean>(false);
     const [modalShow, setModalShow] = useState<boolean>(false);
     const [devices, setDevices] = useState<DevicesInterface>({});
     const [showDevice, setShowDevice] = useState<ProductInterface | null>(null);
@@ -31,7 +32,7 @@ const Dashboard = () => {
             .catch((err) => {
                 console.log(err);
             });
-    }, []);
+    }, [updated]);
 
     const handleViewCard = (key: string) => {
         const _util = () => {
@@ -48,6 +49,8 @@ const Dashboard = () => {
                 onHide={() => setModalShow(false)}
                 show={modalShow}
                 device={showDevice as ProductInterface}
+                updated={updated}
+                setUpdated={setUpdated}
             />
             <Container
                 className="p-3"

@@ -1,4 +1,4 @@
-import React, { ChangeEvent, FormEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import {
     Modal,
     Button,
@@ -9,10 +9,14 @@ import {
     Table,
 } from "react-bootstrap";
 import { ProductInterface } from "../types";
+import axios from "axios";
+import { BACKEND_URI } from "../constants";
 
 interface PropsInterface {
     show: boolean;
     onHide(): void;
+    updated: boolean;
+    setUpdated(arg0: boolean): void;
     device: ProductInterface;
 }
 
@@ -22,21 +26,39 @@ const DeviceDetails = (props: PropsInterface) => {
     const [desc, setDesc] = useState<string>("");
     const [price, setPrice] = useState<number>(0);
     const [messageType, setMessageType] = useState<string>("danger");
-    const [loading, setLoading] = useState<boolean>(false);
+
+    useEffect(() => {
+        if (props.device === null) return;
+        setPrice(Number.parseFloat(props.device.price));
+        setDesc(props.device.desc);
+        setTitle(props.device.title);
+    }, [props.device]);
 
     const handleOnSubmit = (e: FormEvent) => {
         e.preventDefault();
-    };
-
-    interface TextsInterface {
-        [key: string]: string;
-    }
-
-    const texts: TextsInterface = {
-        desc: "Description",
-        title: "Title",
-        price: "Price",
-        productId: "Product Id",
+        props.setUpdated(true);
+        axios({
+            url: `${BACKEND_URI}/setDevice`,
+            data: {
+                title,
+                price,
+                desc,
+                productId: props.device.productId,
+            },
+            method: "POST",
+        })
+            .then(() => {
+                setMessage("Values updated successfully!");
+                setMessageType("info");
+            })
+            .catch((err) => {
+                console.log(err);
+                setMessage("Error while updating information!");
+                setMessageType("warning");
+            })
+            .finally(() => {
+                props.setUpdated(false);
+            });
     };
 
     if (props.device !== null)
@@ -54,30 +76,24 @@ const DeviceDetails = (props: PropsInterface) => {
                         </Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <Table className="m-2">
+                        <Table className="m-2" striped hover bordered>
                             <tbody>
-                                {Object.keys(props.device).map((key) => {
-                                    return (
-                                        <>
-                                            <tr key={key}>
-                                                <th>
-                                                    {
-                                                        texts[
-                                                            key as keyof TextsInterface
-                                                        ]
-                                                    }
-                                                </th>
-                                                <td>
-                                                    {
-                                                        props.device[
-                                                            key as keyof ProductInterface
-                                                        ]
-                                                    }
-                                                </td>
-                                            </tr>
-                                        </>
-                                    );
-                                })}
+                                <tr>
+                                    <th>Title</th>
+                                    <td>{title}</td>
+                                </tr>
+                                <tr>
+                                    <th>Price</th>
+                                    <td>$ {price}</td>
+                                </tr>
+                                <tr>
+                                    <th>Desc</th>
+                                    <td>{desc}</td>
+                                </tr>
+                                <tr>
+                                    <th>Desc</th>
+                                    <td>{desc}</td>
+                                </tr>
                             </tbody>
                         </Table>
                         <Form className="m-2" onSubmit={handleOnSubmit}>
@@ -140,14 +156,21 @@ const DeviceDetails = (props: PropsInterface) => {
                             <Button
                                 type="submit"
                                 className="w-100 m-2"
-                                disabled={loading}
+                                disabled={props.updated}
                             >
                                 Submit Details
                             </Button>
                         </Form>
                     </Modal.Body>
                     <Modal.Footer>
-                        <Button onClick={props.onHide}>Close</Button>
+                        <Button
+                            onClick={() => {
+                                props.onHide();
+                                setMessage("");
+                            }}
+                        >
+                            Close
+                        </Button>
                     </Modal.Footer>
                 </Modal>
             </>
