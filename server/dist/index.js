@@ -16,6 +16,7 @@ const loadJSON = (fileName) => {
 };
 let data = loadJSON(FILENAME);
 let devices = loadJSON("devices.json");
+let customers = loadJSON("customers.json");
 const saveJSON = (fileName, data) => {
     fs_1.default.writeFileSync(path_1.default.join(__dirname, "..", fileName), JSON.stringify(data));
 };
@@ -101,6 +102,15 @@ app.get("/getPrice", (req, res) => {
         }
     }
     return res.send("Not Found");
+});
+app.post("/registerUser", (req, res) => {
+    return res.status(200).json({ message: "ok", body: req.body });
+});
+app.post("/updateId", (req, res) => {
+    return res.status(200).json({ message: "ok" });
+});
+app.get("/getId", (req, res) => {
+    return res.status(200).json({ message: "ok" });
 });
 app.listen(port, () => {
     return console.log(`Server is listening on ${port}`);

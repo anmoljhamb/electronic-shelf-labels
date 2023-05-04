@@ -1,7 +1,12 @@
 import express, { Request, Response } from "express";
 import path from "path";
 import fs from "fs";
-import { DataInterface, DevicesInterface, ProductInterface } from "./types";
+import {
+    Customers,
+    DataInterface,
+    DevicesInterface,
+    ProductInterface,
+} from "./types";
 import morgan from "morgan";
 import cors from "cors";
 
@@ -9,7 +14,9 @@ const app = express();
 const port = process.env.PORT || 8080;
 const FILENAME = "data.json";
 
-const loadJSON = (fileName: string): DataInterface | DevicesInterface => {
+const loadJSON = (
+    fileName: string
+): DataInterface | DevicesInterface | Customers => {
     return JSON.parse(
         fs.readFileSync(path.join(__dirname, "..", fileName), "utf-8")
     );
@@ -17,8 +24,12 @@ const loadJSON = (fileName: string): DataInterface | DevicesInterface => {
 
 let data: DataInterface = loadJSON(FILENAME) as DataInterface;
 let devices: DevicesInterface = loadJSON("devices.json") as DevicesInterface;
+let customers: Customers = loadJSON("customers.json") as Customers;
 
-const saveJSON = (fileName: string, data: DataInterface | DevicesInterface) => {
+const saveJSON = (
+    fileName: string,
+    data: DataInterface | DevicesInterface | Customers
+) => {
     fs.writeFileSync(
         path.join(__dirname, "..", fileName),
         JSON.stringify(data)
@@ -125,6 +136,18 @@ app.get("/getPrice", (req, res) => {
     }
 
     return res.send("Not Found");
+});
+
+app.post("/registerUser", (req, res) => {
+    return res.status(200).json({ message: "ok", body: req.body });
+});
+
+app.post("/updateId", (req, res) => {
+    return res.status(200).json({ message: "ok" });
+});
+
+app.get("/getId", (req, res) => {
+    return res.status(200).json({ message: "ok" });
 });
 
 app.listen(port, () => {
