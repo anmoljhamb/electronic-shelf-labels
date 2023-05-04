@@ -178,8 +178,20 @@ app.post("/updateId", (req, res) => {
     return res.status(200).json({ message: "ok" });
 });
 
-app.get("/getId", (req, res) => {
-    return res.status(200).json({ message: "ok" });
+app.get("/getId/:email", (req, res) => {
+    const email = req.params.email;
+
+    let idFound = false;
+    let personId = "keyNotFound";
+
+    Object.keys(customers).forEach((key) => {
+        if (customers[key].email === email) {
+            idFound = true;
+            personId = key;
+        }
+    });
+
+    return res.status(200).json({ message: "ok", cardId: personId });
 });
 
 app.listen(port, () => {
