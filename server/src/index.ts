@@ -139,6 +139,20 @@ app.get("/getPrice", (req, res) => {
 });
 
 app.post("/registerUser", (req, res) => {
+    interface body {
+        cardId: string;
+        user: string;
+    }
+    const data = req.body as body;
+
+    if (!(data.cardId in customers)) {
+        customers[data.cardId] = {
+            email: data.user,
+            cart: [],
+        };
+    }
+
+    saveJSON("customers.json", customers);
     return res.status(200).json({ message: "ok", body: req.body });
 });
 

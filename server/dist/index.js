@@ -104,6 +104,14 @@ app.get("/getPrice", (req, res) => {
     return res.send("Not Found");
 });
 app.post("/registerUser", (req, res) => {
+    const data = req.body;
+    if (!(data.cardId in customers)) {
+        customers[data.cardId] = {
+            email: data.user,
+            cart: [],
+        };
+    }
+    saveJSON("customers.json", customers);
     return res.status(200).json({ message: "ok", body: req.body });
 });
 app.post("/updateId", (req, res) => {
