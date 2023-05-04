@@ -149,6 +149,25 @@ app.get("/addToCart/:cardId/:productId", (req, res) => {
     saveJSON("customers.json", customers);
     return res.status(200).json({ message: "ok" });
 });
+app.get("/removeFromCart/:cardId/:productId", (req, res) => {
+    const cardId = req.params.cardId;
+    const productId = req.params.productId;
+    const removeFromArray = (arr, key) => {
+        let i;
+        for (i = 0; i < arr.length; i++) {
+            if (arr[i] === key) {
+                break;
+            }
+        }
+        if (i === arr.length) {
+            return arr;
+        }
+        return [...arr.slice(0, i), ...arr.slice(i + 1)];
+    };
+    customers[cardId].cart = removeFromArray(customers[cardId].cart, productId);
+    saveJSON("customers.json", customers);
+    return res.status(200).json({ message: "ok" });
+});
 app.listen(port, () => {
     return console.log(`Server is listening on ${port}`);
 });
