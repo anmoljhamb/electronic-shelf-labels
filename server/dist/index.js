@@ -134,6 +134,14 @@ app.get("/getId/:email", (req, res) => {
     });
     return res.status(200).json({ message: "ok", cardId: personId });
 });
+app.get("/getTotal/:cardId", (req, res) => {
+    const cardId = req.params.cardId;
+    let total = 0;
+    customers[cardId].cart.forEach((productId) => {
+        total += Number.parseInt(devices[productId].price);
+    });
+    return res.status(200).json({ message: "ok", total });
+});
 app.listen(port, () => {
     return console.log(`Server is listening on ${port}`);
 });
