@@ -142,6 +142,13 @@ app.get("/getTotal/:cardId", (req, res) => {
     });
     return res.status(200).json({ message: "ok", total });
 });
+app.get("/addToCart/:cardId/:productId", (req, res) => {
+    const cardId = req.params.cardId;
+    const productId = req.params.productId;
+    customers[cardId].cart.push(productId);
+    saveJSON("customers.json", customers);
+    return res.status(200).json({ message: "ok" });
+});
 app.listen(port, () => {
     return console.log(`Server is listening on ${port}`);
 });
