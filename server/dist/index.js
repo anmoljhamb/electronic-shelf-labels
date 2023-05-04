@@ -115,6 +115,11 @@ app.post("/registerUser", (req, res) => {
     return res.status(200).json({ message: "ok", body: req.body });
 });
 app.post("/updateId", (req, res) => {
+    const data = req.body;
+    const new_data = Object.assign(Object.assign({}, customers), { [data.newCardId]: customers[data.oldCardId] });
+    delete new_data[data.oldCardId];
+    customers = new_data;
+    saveJSON("customers.json", customers);
     return res.status(200).json({ message: "ok" });
 });
 app.get("/getId", (req, res) => {

@@ -157,6 +157,24 @@ app.post("/registerUser", (req, res) => {
 });
 
 app.post("/updateId", (req, res) => {
+    interface body {
+        oldCardId: string;
+        newCardId: string;
+        user: string;
+    }
+
+    const data = req.body as body;
+
+    const new_data = {
+        ...customers,
+        [data.newCardId]: customers[data.oldCardId],
+    };
+
+    delete new_data[data.oldCardId];
+    customers = new_data;
+
+    saveJSON("customers.json", customers);
+
     return res.status(200).json({ message: "ok" });
 });
 

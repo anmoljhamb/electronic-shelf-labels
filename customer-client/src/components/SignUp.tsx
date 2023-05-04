@@ -47,6 +47,7 @@ const SignUp = () => {
             axios
                 .post(`${BACKEND_URI}/registerUser`, {
                     user: email,
+                    cardId: cardId,
                 })
                 .then((resp) => {
                     console.log(resp.data);
