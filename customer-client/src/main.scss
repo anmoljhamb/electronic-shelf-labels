@@ -1,0 +1,34 @@
+@import "./variables.scss";
+
+#root {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow-y: auto;
+    background-color: $dark;
+    .container,
+    .container-fluid {
+        background-color: $light;
+        color: $dark;
+    }
+    #signUp,
+    #logIn,
+    #forgotPassword {
+        max-width: 35rem;
+    }
+    #navbar {
+        width: 100% !important;
+        position: absolute;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: auto;
+    }
+    #cardContainer {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@import "../node_modules/bootstrap/scss/bootstrap.scss";
