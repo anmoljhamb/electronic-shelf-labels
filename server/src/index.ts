@@ -36,7 +36,7 @@ const saveJSON = (
     );
 };
 
-app.use(morgan("dev"));
+// app.use(morgan("dev"));
 app.use(cors());
 app.use(express.json());
 
@@ -122,7 +122,7 @@ app.get("/getPrice", (req, res) => {
             let lastValue = Number.parseFloat(lastValueStr);
             let secondLast = Number.parseFloat(secondLastStr);
 
-            console.log(lastValue);
+            // console.log(lastValue);
 
             if (lastValue >= secondLast) {
                 return res.send(`1${lastValue}`);
@@ -205,9 +205,11 @@ app.get("/getTotal/:cardId", (req, res) => {
     return res.status(200).json({ message: "ok", total });
 });
 
-app.get("/addToCart/:cardId/:productId", (req, res) => {
-    const cardId = req.params.cardId;
-    const productId = req.params.productId;
+app.get("/addToCart", (req, res) => {
+    console.log("adding to the cart!!!");
+
+    const cardId = req.query.cardId as string;
+    const productId = req.query.productId as string;
 
     customers[cardId].cart.push(productId);
     saveJSON("customers.json", customers);
@@ -215,9 +217,9 @@ app.get("/addToCart/:cardId/:productId", (req, res) => {
     return res.status(200).json({ message: "ok" });
 });
 
-app.get("/removeFromCart/:cardId/:productId", (req, res) => {
-    const cardId = req.params.cardId;
-    const productId = req.params.productId;
+app.get("/removeFromCart", (req, res) => {
+    const cardId = req.query.cardId as string;
+    const productId = req.query.productId as string;
 
     const removeFromArray = (arr: string[], key: string) => {
         let i;

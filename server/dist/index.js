@@ -6,7 +6,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
-const morgan_1 = __importDefault(require("morgan"));
 const cors_1 = __importDefault(require("cors"));
 const app = (0, express_1.default)();
 const port = process.env.PORT || 8080;
@@ -20,7 +19,7 @@ let customers = loadJSON("customers.json");
 const saveJSON = (fileName, data) => {
     fs_1.default.writeFileSync(path_1.default.join(__dirname, "..", fileName), JSON.stringify(data));
 };
-app.use((0, morgan_1.default)("dev"));
+// app.use(morgan("dev"));
 app.use((0, cors_1.default)());
 app.use(express_1.default.json());
 app.get("/", (req, res) => {
@@ -90,7 +89,7 @@ app.get("/getPrice", (req, res) => {
             let secondLastStr = data[productId].at(-2).price;
             let lastValue = Number.parseFloat(lastValueStr);
             let secondLast = Number.parseFloat(secondLastStr);
-            console.log(lastValue);
+            // console.log(lastValue);
             if (lastValue >= secondLast) {
                 return res.send(`1${lastValue}`);
             }
@@ -142,16 +141,17 @@ app.get("/getTotal/:cardId", (req, res) => {
     });
     return res.status(200).json({ message: "ok", total });
 });
-app.get("/addToCart/:cardId/:productId", (req, res) => {
-    const cardId = req.params.cardId;
-    const productId = req.params.productId;
+app.get("/addToCart", (req, res) => {
+    console.log("adding to the cart!!!");
+    const cardId = req.query.cardId;
+    const productId = req.query.productId;
     customers[cardId].cart.push(productId);
     saveJSON("customers.json", customers);
     return res.status(200).json({ message: "ok" });
 });
-app.get("/removeFromCart/:cardId/:productId", (req, res) => {
-    const cardId = req.params.cardId;
-    const productId = req.params.productId;
+app.get("/removeFromCart", (req, res) => {
+    const cardId = req.query.cardId;
+    const productId = req.query.productId;
     const removeFromArray = (arr, key) => {
         let i;
         for (i = 0; i < arr.length; i++) {
