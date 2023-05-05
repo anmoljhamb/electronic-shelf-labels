@@ -149,6 +149,12 @@ app.get("/addToCart", (req, res) => {
     saveJSON("customers.json", customers);
     return res.status(200).json({ message: "ok" });
 });
+app.get("/emptyCustomer/:cardId", (req, res) => {
+    const cardId = req.params.cardId;
+    customers[cardId].cart = [];
+    saveJSON("customers.json", customers);
+    return res.status(200).json({ message: "ok" });
+});
 app.get("/removeFromCart", (req, res) => {
     const cardId = req.query.cardId;
     const productId = req.query.productId;

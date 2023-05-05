@@ -22,6 +22,7 @@ const Dashboard = () => {
     const [devices, setDevices] = useState<DevicesInterface>({});
     const [customers, setCustomers] = useState<CustomersInterface>({});
     const [showDevice, setShowDevice] = useState<ProductInterface | null>(null);
+    const [counter, setCounter] = useState<number>(0);
 
     useEffect(() => {
         axios
@@ -43,7 +44,7 @@ const Dashboard = () => {
             .catch((err) => {
                 console.log(err);
             });
-    }, [updated]);
+    }, [updated, counter]);
 
     const handleViewCard = (key: string) => {
         const _util = () => {
@@ -51,6 +52,28 @@ const Dashboard = () => {
             setShowDevice(devices[key]);
         };
         return _util;
+    };
+
+    const handleOnPaid = (key: string) => {
+        const _util = () => {
+            axios
+                .get(`${BACKEND_URI}/emptyCustomer/${key}`)
+                .then(() => {
+                    alert("Paid successfully!");
+                    setCounter((old) => old + 1);
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        };
+        return _util;
+    };
+
+    const customerTotal = (key: string) => {
+        return customers[key].cart.reduce((prevValue, currentValue) => {
+            return (Number.parseFloat(devices[currentValue].price) +
+                (prevValue as number)) as number;
+        }, 0);
     };
 
     return (
@@ -98,35 +121,25 @@ const Dashboard = () => {
                 <Container id="cardContainer">
                     {Object.keys(customers).length > 0 &&
                         Object.keys(customers).map((key) => {
-                            return (
-                                <Card id="card" key={key}>
-                                    <Card.Header as={"h5"}>{key}</Card.Header>
-                                    <Card.Body>
-                                        <Card.Title>
-                                            {customers[key].email}
-                                        </Card.Title>
-                                        <Card.Subtitle>
-                                            Total ${" "}
-                                            {customers[key].cart.reduce(
-                                                (prevValue, currentValue) => {
-                                                    return (
-                                                        Number.parseFloat(
-                                                            devices[
-                                                                currentValue
-                                                            ].price
-                                                        ) +
-                                                        (prevValue as number)
-                                                    );
-                                                },
-                                                0
-                                            )}
-                                        </Card.Subtitle>
-                                        <Button onClick={handleViewCard(key)}>
-                                            Paid
-                                        </Button>
-                                    </Card.Body>
-                                </Card>
-                            );
+                            if ((customerTotal(key) as number) > 0)
+                                return (
+                                    <Card id="card" key={key}>
+                                        <Card.Header as={"h5"}>
+                                            {key}
+                                        </Card.Header>
+                                        <Card.Body>
+                                            <Card.Title>
+                                                {customers[key].email}
+                                            </Card.Title>
+                                            <Card.Subtitle>
+                                                Total $ {customerTotal(key)}
+                                            </Card.Subtitle>
+                                            <Button onClick={handleOnPaid(key)}>
+                                                Paid
+                                            </Button>
+                                        </Card.Body>
+                                    </Card>
+                                );
                         })}
                 </Container>
             </Container>
