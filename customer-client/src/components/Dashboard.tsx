@@ -16,6 +16,7 @@ const Dashboard = () => {
     const { currentUser } = authContext;
     const navigator = useNavigate();
     const [loading, setLoading] = useState<boolean>(true);
+    const [cardId, setCardId] = useState<string>("");
     const [updated, setUpdated] = useState<boolean>(false);
     const [modalShow, setModalShow] = useState<boolean>(false);
     const [devices, setDevices] = useState<DevicesInterface>({});
@@ -32,6 +33,18 @@ const Dashboard = () => {
             .catch((err) => {
                 console.log(err);
             });
+
+        axios
+            .get(`${BACKEND_URI}/getId/${currentUser?.email}`)
+            .then((resp) => {
+                setCardId(resp.data.cardId as string);
+                // console.log(resp.data);
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+
+        axios.get;
     }, [updated]);
 
     const handleViewCard = (key: string) => {
@@ -60,29 +73,11 @@ const Dashboard = () => {
                     <h1 className="text-center">Dashboard</h1>
                     <hr />
                 </Row>
-                <Container id="cardContainer">
-                    {Object.keys(devices).length > 0 &&
-                        Object.keys(devices).map((key) => {
-                            return (
-                                <Card id="card" key={key}>
-                                    <Card.Header as={"h5"}>{key}</Card.Header>
-                                    <Card.Body>
-                                        <Card.Title>
-                                            {devices[key].title}
-                                        </Card.Title>
-                                        <Card.Subtitle>
-                                            {devices[key].price}
-                                        </Card.Subtitle>
-                                        <Card.Text>
-                                            {devices[key].desc}
-                                        </Card.Text>
-                                        <Button onClick={handleViewCard(key)}>
-                                            Edit/View
-                                        </Button>
-                                    </Card.Body>
-                                </Card>
-                            );
-                        })}
+                <Container className="d-flex justify-center align-items-center">
+                    <h1 className="d-flex justify-center align-items-center text-center">
+                        You have been registered successfully! Your card id is{" "}
+                        {cardId}
+                    </h1>
                 </Container>
             </Container>
         </>

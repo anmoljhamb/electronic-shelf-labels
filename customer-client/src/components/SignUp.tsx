@@ -39,7 +39,7 @@ const SignUp = () => {
         try {
             setMessage("");
             setLoading(true);
-            // await signUp(email, password);
+            await signUp(email, password);
             setMessage(
                 "User created Successfully! You'll be redirected in a couple of seconds. Please wait."
             );
@@ -57,9 +57,9 @@ const SignUp = () => {
                 });
 
             setMessageType("info");
-            // setTimeout(() => {
-            //     navigator("/");
-            // }, 3000);
+            setTimeout(() => {
+                navigator("/");
+            }, 3000);
         } catch {
             setMessage("Failed to create the account.");
         }
