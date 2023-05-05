@@ -168,6 +168,9 @@ app.get("/removeFromCart", (req, res) => {
     saveJSON("customers.json", customers);
     return res.status(200).json({ message: "ok" });
 });
+app.get("/customers", (req, res) => {
+    res.status(200).json({ customers, devices });
+});
 app.listen(port, () => {
     return console.log(`Server is listening on ${port}`);
 });

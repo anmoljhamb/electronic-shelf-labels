@@ -20,3 +20,10 @@ export interface ProductInterface {
 export interface DevicesInterface {
     [key: string]: ProductInterface;
 }
+
+export interface CustomersInterface {
+    [key: string]: {
+        email: string;
+        cart: (keyof DevicesInterface)[];
+    };
+}

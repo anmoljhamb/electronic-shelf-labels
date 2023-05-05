@@ -3,6 +3,7 @@ import { Button, Card, Col, Container, Row } from "react-bootstrap";
 import { AuthContext } from "../contexts/AuthContext";
 import {
     AuthContextInterface,
+    CustomersInterface,
     DevicesInterface,
     ProductInterface,
 } from "../types";
@@ -19,6 +20,7 @@ const Dashboard = () => {
     const [updated, setUpdated] = useState<boolean>(false);
     const [modalShow, setModalShow] = useState<boolean>(false);
     const [devices, setDevices] = useState<DevicesInterface>({});
+    const [customers, setCustomers] = useState<CustomersInterface>({});
     const [showDevice, setShowDevice] = useState<ProductInterface | null>(null);
 
     useEffect(() => {
@@ -28,6 +30,15 @@ const Dashboard = () => {
                 // console.log(resp.data);
                 setDevices(resp.data as DevicesInterface);
                 setLoading(false);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+
+        axios
+            .get(`${BACKEND_URI}/customers`)
+            .then((resp) => {
+                setCustomers(resp.data.customers as CustomersInterface);
             })
             .catch((err) => {
                 console.log(err);
@@ -78,6 +89,40 @@ const Dashboard = () => {
                                         </Card.Text>
                                         <Button onClick={handleViewCard(key)}>
                                             Edit/View
+                                        </Button>
+                                    </Card.Body>
+                                </Card>
+                            );
+                        })}
+                </Container>
+                <Container id="cardContainer">
+                    {Object.keys(customers).length > 0 &&
+                        Object.keys(customers).map((key) => {
+                            return (
+                                <Card id="card" key={key}>
+                                    <Card.Header as={"h5"}>{key}</Card.Header>
+                                    <Card.Body>
+                                        <Card.Title>
+                                            {customers[key].email}
+                                        </Card.Title>
+                                        <Card.Subtitle>
+                                            Total ${" "}
+                                            {customers[key].cart.reduce(
+                                                (prevValue, currentValue) => {
+                                                    return (
+                                                        Number.parseFloat(
+                                                            devices[
+                                                                currentValue
+                                                            ].price
+                                                        ) +
+                                                        (prevValue as number)
+                                                    );
+                                                },
+                                                0
+                                            )}
+                                        </Card.Subtitle>
+                                        <Button onClick={handleViewCard(key)}>
+                                            Paid
                                         </Button>
                                     </Card.Body>
                                 </Card>
