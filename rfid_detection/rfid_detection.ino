@@ -14,6 +14,25 @@
 
 MFRC522 mfrc522(SS_PIN, RST_PIN); // Create MFRC522 instance
 
+void core1() {
+/*
+  code for the core which will focus on the RFID sensor, and the LCD
+  1. See if a card is present or not.
+  2. if it's present, trigger an interrupt, and start the timer, or basically 
+     keep a count, init the start time 
+  3. Then, constantly check for a loop, and check if the the same card was still
+     present or not. 
+  4. also add debouncing, along with it. an interval of 100ms, works
+  5. the moment it becomes false, the while condition, we check the current time
+     using millis, and we find out the total duration for which the card was held
+  6. Add a time out of 4s, if it's any longer than that, we're good, and we can
+     just say no, and exit out.
+  7. Based on durations, decide an action, and show progress, and send request
+     to backend.
+  8. That will be handled by another core.
+*/
+}
+
 void setup() {
   Serial.begin(9600); // Initialize serial communications with the PC
   while (!Serial)
