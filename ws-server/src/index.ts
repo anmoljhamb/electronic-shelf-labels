@@ -1,11 +1,26 @@
 import express, { Express, Request, Response } from 'express'
-import bodyParser from 'body-parser'
+import http from 'http'
+import WebSocket from 'ws'
 
 const app: Express = express()
+const server = http.createServer(app)
+const wss = new WebSocket.Server({ server })
 const PORT = process.env.PORT || 8080
 
-app.use(bodyParser.urlencoded({ extended: false }))
-app.use(bodyParser.json())
+app.use(express.urlencoded({ extended: false }))
+app.use(express.json())
+
+wss.on('connection', (ws) => {
+  console.log('web socket connected')
+
+  ws.on('message', (msg) => {
+    console.log(`recieved: ${msg}`)
+  })
+
+  ws.on('close', () => {
+    console.log('client disconnected')
+  })
+})
 
 app.get('/', (_req: Request, res: Response) => {
   res.json({ message: 'Hello World!' })
