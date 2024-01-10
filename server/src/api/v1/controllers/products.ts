@@ -27,3 +27,20 @@ export const fetchAllProducts = async (
     next(err);
   }
 };
+
+export const deleteProductById = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { productId } = req.query;
+    console.log(req.query);
+    const product = await Products.findOneAndDelete({ productId });
+    res
+      .status(200)
+      .json({ msg: "Delete Product by Id", deletedProduct: product });
+  } catch (err) {
+    next(err);
+  }
+};
