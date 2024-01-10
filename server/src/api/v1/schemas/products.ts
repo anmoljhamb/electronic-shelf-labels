@@ -18,6 +18,11 @@ const productSchema = new mongoose.Schema<IProduct>({
     type: Number,
     required: true,
   },
+  productId: {
+    type: String,
+    required: true,
+    unique: true,
+  },
 });
 
 export const Products = mongoose.model("product", productSchema);
