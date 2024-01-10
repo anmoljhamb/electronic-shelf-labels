@@ -22,10 +22,8 @@ void onEventsCallback(WebsocketsEvent event, String data) {
 }
 
 WebsocketsClient client;
-WiFiClient wClient;
-const char *websockets_server =
-  "ws://192.168.1.5:8080";  // server adress and port
-
+String host = "ws://192.168.1.7:8080";
+String PRODUCT_ID = "pid-1";
 
 void setup() {
   Serial.begin(115200);
@@ -52,11 +50,9 @@ void setup() {
   client.onMessage(onMessageCallback);
   client.onEvent(onEventsCallback);
 
-  client.connect(websockets_server);
-
-  // Send a message
+  client.addHeader("product_id", PRODUCT_ID);
+  client.connect(host + "/echo");
   client.send("Hi Server!");
-  // Send a ping
   client.ping();
 }
 

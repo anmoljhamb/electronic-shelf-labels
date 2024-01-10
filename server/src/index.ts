@@ -38,6 +38,8 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
 
 server.on("upgrade", (req, socket, head) => {
   const pathname = req.url;
+  const headers = req.headers;
+  console.log(headers.product_id);
   console.log(`Recvd a socket upgrade req on ${req.url}`);
 
   if (pathname === "/echo") {
