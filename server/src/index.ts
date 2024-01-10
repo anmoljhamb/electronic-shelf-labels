@@ -6,10 +6,13 @@ import { ReasonPhrases } from "http-status-codes";
 import path from "path";
 import { apiRouter } from "./api/v1";
 import { echoWs } from "./api/v1/sockets/echo";
+import mongoose from "mongoose";
 
 dotenv.config({ path: path.join(__dirname, "..", "config.env") });
 
 const PORT = process.env.PORT || 8000;
+const DATABASE_URI =
+  process.env.DATABASE_URI || "mongodb://127.0.0.1:27017/esl";
 const app = express();
 const server = createServer(app);
 
@@ -38,6 +41,9 @@ server.on("upgrade", (req, socket, head) => {
   }
 });
 
-server.listen(PORT, () => {
-  console.log(`Listening on the url *:${PORT}`);
+server.listen(PORT, async () => {
+  mongoose.set("strictQuery", true);
+  await mongoose.connect(DATABASE_URI);
+  console.log("Database connected.");
+  console.log(`Server listening on the url *:${PORT}`);
 });
