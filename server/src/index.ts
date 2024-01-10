@@ -4,11 +4,12 @@ import createHttpError from "http-errors";
 import { ReasonPhrases } from "http-status-codes";
 import path from "path";
 import { apiRouter } from "./api/v1";
+import expressWs from "express-ws";
 
 dotenv.config({ path: path.join(__dirname, "..", "config.env") });
 
 const PORT = process.env.PORT || 8000;
-const app = express();
+const { app } = expressWs(express());
 
 app.use("/api/v1", apiRouter);
 
