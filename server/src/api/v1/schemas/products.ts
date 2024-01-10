@@ -1,3 +1,4 @@
+import createHttpError from "http-errors";
 import mongoose from "mongoose";
 import { IProduct } from "../types";
 
@@ -23,6 +24,15 @@ const productSchema = new mongoose.Schema<IProduct>({
     required: true,
     unique: true,
   },
+});
+
+productSchema.pre("save", async function (next) {
+  const model = mongoose.model("product", productSchema);
+  const existing = await model.findOne({ productId: this.productId });
+  if (existing) {
+    const err = new createHttpError.BadRequest("The productId already exists.");
+    next(err);
+  } else next();
 });
 
 export const Products = mongoose.model("product", productSchema);
