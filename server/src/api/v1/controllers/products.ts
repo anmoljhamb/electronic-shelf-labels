@@ -1,8 +1,8 @@
-import { NextFunction, Request, Response } from "express";
-import { Products } from "../schemas/products";
-import { IProduct } from "../types";
+import { Request, Response } from "express";
 import createHttpError from "http-errors";
 import { protectedFunc } from "../../utils/protectedFunc";
+import { Products } from "../schemas/products";
+import { IProduct } from "../types";
 
 export const fetchAllProducts = protectedFunc(
   async (_req: Request, res: Response) => {
