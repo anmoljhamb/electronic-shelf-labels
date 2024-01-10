@@ -3,6 +3,7 @@ import {
   createNewProduct,
   deleteProductById,
   fetchAllProducts,
+  fetchProductById,
 } from "../controllers/products";
 
 export const productRouter = Router();
@@ -10,4 +11,5 @@ export const productRouter = Router();
 productRouter
   .get("/", fetchAllProducts)
   .post("/", createNewProduct)
-  .delete("/", deleteProductById);
+  .delete("/:productId", deleteProductById)
+  .get("/:productId", fetchProductById);

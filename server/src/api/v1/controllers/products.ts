@@ -34,7 +34,7 @@ export const fetchProductById = async (
   next: NextFunction,
 ) => {
   try {
-    const { productId } = req.query;
+    const { productId } = req.params;
     const product = await Products.findOne({ productId });
     res
       .status(200)
@@ -50,7 +50,7 @@ export const deleteProductById = async (
   next: NextFunction,
 ) => {
   try {
-    const { productId } = req.query;
+    const { productId } = req.params;
     const product = await Products.findOneAndDelete({ productId });
     res
       .status(200)
