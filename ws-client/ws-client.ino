@@ -67,6 +67,9 @@ void onEventsCallback(WebsocketsEvent event, String data) {
 }
 
 void connectClient() {
+  delay(TIMEOUT);
   Serial.println("Connecting to the client...");
-  client.connect(host);
+  bool status = client.connect(host);
+  if (!status)
+    connectClient();
 }
