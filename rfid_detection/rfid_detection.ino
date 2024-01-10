@@ -3,10 +3,10 @@
 
 /*
     RFID.RST = 4
+    RFID.MOSI = 5
     RFID.SCK = 18
     RFID.MISO = 19
     RFID.SDA = 21
-    RFID.MOSI = 23
 */
 
 #define RST_PIN 4
@@ -52,11 +52,18 @@ void loop() {
   }
   if (cardStartTime == 0) {
     cardStartTime = millis();
-    Serial.print("UID: ");
-    printDec(rfid.uid.uidByte, rfid.uid.size);
-    Serial.println();
+    Serial.println(getUid(rfid.uid.uidByte, rfid.uid.size));
   }
   lastReadTime = millis();
+}
+
+String getUid(byte *buffer, byte bufferSize) {
+  String uid = "";
+  for (byte i = 0; i < bufferSize; i++) {
+    uid += String(buffer[i], HEX);
+  }
+  uid.toUpperCase();
+  return uid;
 }
 
 void printDec(byte *buffer, byte bufferSize) {
