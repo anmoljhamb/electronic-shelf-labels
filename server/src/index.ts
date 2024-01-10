@@ -38,11 +38,12 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
 
 server.on("upgrade", (req, socket, head) => {
   const pathname = req.url as string;
-  const headers = req.headers;
-  console.log(headers.product_id);
-  console.log(`Recvd a socket upgrade req on ${req.url}`);
+  const productId = req.headers.product_id as string;
+  console.log(
+    `Recvd a socket upgrade req on ${req.url} by product ${productId}`,
+  );
 
-  if (pathname === "/api/v1/products/sockets/echo") {
+  if (pathname === "/api/v1/products/sockets") {
     echoWs.handleUpgrade(req, socket, head, (ws) => {
       echoWs.emit("connection", ws, req);
     });

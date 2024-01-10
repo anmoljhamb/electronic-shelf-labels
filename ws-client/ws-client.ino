@@ -4,26 +4,13 @@
 
 using namespace websockets;
 
-void onMessageCallback(WebsocketsMessage message) {
-  Serial.print("Got Message: ");
-  Serial.println(message.data());
-}
-
-void onEventsCallback(WebsocketsEvent event, String data) {
-  if (event == WebsocketsEvent::ConnectionOpened) {
-    Serial.println("Connnection Opened");
-  } else if (event == WebsocketsEvent::ConnectionClosed) {
-    Serial.println("Connnection Closed");
-  } else if (event == WebsocketsEvent::GotPing) {
-    Serial.println("Got a Ping!");
-  } else if (event == WebsocketsEvent::GotPong) {
-    Serial.println("Got a Pong!");
-  }
-}
-
 WebsocketsClient client;
 String host = "ws://192.168.1.7:8080/api/v1/products/sockets";
 String PRODUCT_ID = "pid-1";
+
+void onMessageCallback(WebsocketsMessage message);
+void onEventsCallback(WebsocketsEvent event, String data);
+void connectClient();
 
 void setup() {
   Serial.begin(115200);
@@ -51,12 +38,31 @@ void setup() {
   client.onEvent(onEventsCallback);
 
   client.addHeader("product_id", PRODUCT_ID);
-  client.connect(host + "/echo");
+  connectClient();
   client.send("Hi Server!");
   client.ping();
 }
 
-void loop() {
-  client.poll();
-  delay(2000);
+void loop() { client.poll(); }
+
+void onMessageCallback(WebsocketsMessage message) {
+  Serial.print("Got Message: ");
+  Serial.println(message.data());
+}
+
+void onEventsCallback(WebsocketsEvent event, String data) {
+  if (event == WebsocketsEvent::ConnectionOpened) {
+    Serial.println("Connnection Opened");
+  } else if (event == WebsocketsEvent::ConnectionClosed) {
+    Serial.println("Connnection Closed");
+    connectClient();
+  } else if (event == WebsocketsEvent::GotPing) {
+    Serial.println("Got a Ping!");
+  } else if (event == WebsocketsEvent::GotPong) {
+    Serial.println("Got a Pong!");
+  }
+}
+
+void connectClient(){
+  client.connect(host);
 }
