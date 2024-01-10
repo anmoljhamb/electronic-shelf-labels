@@ -1,5 +1,5 @@
 import * as express from "express";
-import { productRouter } from "./routes/product";
+import { productRouter } from "./routes/products";
 
 export const apiRouter = express.Router();
 

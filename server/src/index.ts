@@ -7,6 +7,7 @@ import path from "path";
 import { apiRouter } from "./api/v1";
 import { echoWs } from "./api/v1/sockets/echo";
 import mongoose from "mongoose";
+import morgan from "morgan";
 
 dotenv.config({ path: path.join(__dirname, "..", "config.env") });
 
@@ -15,6 +16,11 @@ const DATABASE_URI =
   process.env.DATABASE_URI || "mongodb://127.0.0.1:27017/esl";
 const app = express();
 const server = createServer(app);
+
+// Middlewares
+app.use(morgan("dev"));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
 app.use("/api/v1", apiRouter);
 
