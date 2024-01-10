@@ -16,10 +16,6 @@ const productSchema = new mongoose.Schema<IProduct>({
     type: Number,
     required: true,
   },
-  prevPrice: {
-    type: Number,
-    required: true,
-  },
   productId: {
     type: String,
     required: true,
@@ -37,7 +33,7 @@ productSchema.pre("save", async function (next) {
 });
 
 productSchema.post("findOneAndUpdate", function (doc) {
-  console.log("The price just got updated!");
+  console.log(`Update price for productId: ${doc.productId}`);
   const socket = Communication.getSocket(doc.productId);
   socket.send(`UP: ${doc.price}`);
 });
