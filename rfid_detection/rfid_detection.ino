@@ -36,13 +36,18 @@ unsigned long cardStartTime = 0;
 void loop() {
   if (!rfid.PICC_IsNewCardPresent() || !rfid.PICC_ReadCardSerial()) {
     delay(10);
-    if (cardStartTime == 0)
+    if (cardStartTime == 0) {
+      // this part happens when nothing is going on
+      Serial.println("happens when nothing is going on");
+      delay(50);
       return;
+    }
     unsigned long currTime = millis();
     unsigned long timeSinceLastRead = currTime - lastReadTime;
     if (timeSinceLastRead > 50) {
       // means that we have been here since quite a while since the last read,
       // and it means that our card has probably been left.
+      // ending our function
       unsigned long totalTime = currTime - cardStartTime;
       Serial.print("Stayed for ");
       Serial.println(totalTime);
@@ -52,6 +57,7 @@ void loop() {
   }
   if (cardStartTime == 0) {
     cardStartTime = millis();
+    // happens when the card is bought near for the first time;
     Serial.println(getUid(rfid.uid.uidByte, rfid.uid.size));
   }
   lastReadTime = millis();
