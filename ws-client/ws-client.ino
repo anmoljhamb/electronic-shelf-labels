@@ -22,7 +22,7 @@ void onEventsCallback(WebsocketsEvent event, String data) {
 }
 
 WebsocketsClient client;
-String host = "ws://192.168.1.7:8080";
+String host = "ws://192.168.1.7:8080/api/v1/products/sockets";
 String PRODUCT_ID = "pid-1";
 
 void setup() {
