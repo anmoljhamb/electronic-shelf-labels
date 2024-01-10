@@ -6,7 +6,7 @@
   "keywords": [],
   "scripts": {
     "build": "npx tsc",
-    "start": "TZ='UTC' node dist/index.js",
+    "start": "npm run build && TZ='UTC' node dist/index.js",
     "dev": "TZ='UTC' nodemon src/index.ts",
     "lint": "eslint src/**/*.ts",
     "format": "eslint src/**/*.ts --fix"
