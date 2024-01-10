@@ -28,6 +28,22 @@ export const fetchAllProducts = async (
   }
 };
 
+export const fetchProductById = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { productId } = req.query;
+    const product = await Products.findOne({ productId });
+    res
+      .status(200)
+      .json({ msg: "Fetch Product by Id", deletedProduct: product });
+  } catch (err) {
+    next(err);
+  }
+};
+
 export const deleteProductById = async (
   req: Request,
   res: Response,
@@ -35,7 +51,6 @@ export const deleteProductById = async (
 ) => {
   try {
     const { productId } = req.query;
-    console.log(req.query);
     const product = await Products.findOneAndDelete({ productId });
     res
       .status(200)
