@@ -3,11 +3,14 @@ import express, { NextFunction, Request, Response } from "express";
 import createHttpError from "http-errors";
 import { ReasonPhrases } from "http-status-codes";
 import path from "path";
+import { apiRouter } from "./api/v1";
 
 dotenv.config({ path: path.join(__dirname, "..", "config.env") });
 
 const PORT = process.env.PORT || 8000;
 const app = express();
+
+app.use("/api/v1", apiRouter);
 
 app.use((_req: Request, _res: Response, next: NextFunction) => {
   const err = new createHttpError.NotFound(ReasonPhrases.NOT_FOUND);
