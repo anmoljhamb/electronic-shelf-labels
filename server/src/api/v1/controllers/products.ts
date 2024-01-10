@@ -1,5 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { Products } from "../schemas/products";
+import { IProduct } from "../types";
+import createHttpError from "http-errors";
 
 export const createNewProduct = async (
   req: Request,
@@ -55,6 +57,31 @@ export const deleteProductById = async (
     res
       .status(200)
       .json({ msg: "Delete Product by Id", deletedProduct: product });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const updateProductById = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { productId } = req.params;
+    const body = req.body as Partial<IProduct>;
+    const product = await Products.findOneAndUpdate({ productId }, body, {
+      new: true,
+    });
+    if (!product) {
+      const err = new createHttpError.NotFound(
+        "Product with the given productId was not found",
+      );
+      return next(err);
+    }
+    res
+      .status(200)
+      .json({ msg: "Modify Product by Id", modifiedProduct: product });
   } catch (err) {
     next(err);
   }

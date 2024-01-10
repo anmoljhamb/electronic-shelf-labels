@@ -4,6 +4,7 @@ import {
   deleteProductById,
   fetchAllProducts,
   fetchProductById,
+  updateProductById,
 } from "../controllers/products";
 
 export const productRouter = Router();
@@ -11,5 +12,6 @@ export const productRouter = Router();
 productRouter
   .get("/", fetchAllProducts)
   .post("/", createNewProduct)
+  .get("/:productId", fetchProductById)
   .delete("/:productId", deleteProductById)
-  .get("/:productId", fetchProductById);
+  .patch("/:productId", updateProductById);
