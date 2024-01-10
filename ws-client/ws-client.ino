@@ -7,6 +7,7 @@ using namespace websockets;
 WebsocketsClient client;
 String host = "ws://192.168.1.7:8080/api/v1/products/sockets";
 String PRODUCT_ID = "pid-1";
+int TIMEOUT = 2000;
 
 void onMessageCallback(WebsocketsMessage message);
 void onEventsCallback(WebsocketsEvent event, String data);
@@ -54,7 +55,9 @@ void onEventsCallback(WebsocketsEvent event, String data) {
   if (event == WebsocketsEvent::ConnectionOpened) {
     Serial.println("Connnection Opened");
   } else if (event == WebsocketsEvent::ConnectionClosed) {
-    Serial.println("Connnection Closed");
+    Serial.print("Connnection Closed. Retring in ");
+    Serial.println(TIMEOUT);
+    delay(TIMEOUT);
     connectClient();
   } else if (event == WebsocketsEvent::GotPing) {
     Serial.println("Got a Ping!");
@@ -63,6 +66,7 @@ void onEventsCallback(WebsocketsEvent event, String data) {
   }
 }
 
-void connectClient(){
+void connectClient() {
+  Serial.println("Connecting to the client...");
   client.connect(host);
 }

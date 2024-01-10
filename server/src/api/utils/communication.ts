@@ -20,7 +20,6 @@ export class Communication {
   static removeSocket(productId: string) {
     if (!Communication.hasProduct(productId))
       throw new Error(`Web Socket not found for ${productId}.`);
-    Communication.#sockets[productId].close();
     delete Communication.#sockets[productId];
   }
 }

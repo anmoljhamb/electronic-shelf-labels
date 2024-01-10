@@ -8,6 +8,7 @@ import { apiRouter } from "./api/v1";
 import { echoWs } from "./api/v1/sockets/echo";
 import mongoose from "mongoose";
 import morgan from "morgan";
+import { Communication } from "./api/utils/communication";
 
 dotenv.config({ path: path.join(__dirname, "..", "config.env") });
 
@@ -45,6 +46,7 @@ server.on("upgrade", (req, socket, head) => {
 
   if (pathname === "/api/v1/products/sockets") {
     echoWs.handleUpgrade(req, socket, head, (ws) => {
+      Communication.addSocket(productId, ws);
       echoWs.emit("connection", ws, req);
     });
   }
