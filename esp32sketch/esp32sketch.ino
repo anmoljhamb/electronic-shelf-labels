@@ -1,13 +1,20 @@
 #include "config.h"
 #include <ArduinoWebsockets.h>
 #include <LiquidCrystal_I2C.h>
+#include <MFRC522.h>
+#include <SPI.h>
 #include <WiFi.h>
 
 using namespace websockets;
 
 /*
+  RFID.RST -> ESP32.D4
+  RFID.SDA -> ESP32.D5
+  RFID.SCK -> ESP32.D18
+  RFID.MOSI -> ESP32.D19
   LCD.SDA -> ESP32.SDA ( 21 )
   LCD.SCL -> ESP32.SCL ( 22 )
+  RFID.MISO -> ESP32.D23
 */
 
 /* Constants */
@@ -15,15 +22,20 @@ const int BAUD_RATE = 115200;
 const String HOST = "ws://192.168.1.7:8080/api/v1/products/sockets";
 const String PRODUCT_ID = "pid-1";
 const int TIMEOUT = 2000;
+const byte RST_PIN = 4;
+const byte SS_PIN = 5;
 
 /* Global Variables */
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 WebsocketsClient client;
+MFRC522 rfid(SS_PIN, RST_PIN); // Create MFRC522 instance
 
-/* Function Prototypes */
+/* Prototypes */
+class Response;
 void connectClient();
 void onMessageCallback(WebsocketsMessage message);
 void onEventsCallback(WebsocketsEvent event, String data);
+String getUid(byte *buffer, byte bufferSize);
 
 void setup() {
   Serial.begin(BAUD_RATE);
@@ -64,9 +76,36 @@ void setup() {
   connectClient();
   client.send("Hi Server!");
   client.ping();
+
+  delay(3000);
+  SPI.begin();     // Init SPI bus
+  rfid.PCD_Init(); // Init MFRC522
+  delay(4); // Optional delay. Some board do need more time after init to be
+            // ready, see Readme
+  rfid.PCD_DumpVersionToSerial(); // Show details of PCD - MFRC522 Card
+                                  // Reader details
+  Serial.println(F("Scan PICC to see UID, SAK, type, and data blocks..."));
 }
 
 void loop() { client.poll(); }
+
+class Response {
+private:
+  bool status;
+  unsigned int duration;
+  String uid;
+
+public:
+  Response(bool s, unsigned int d = 0, String u = "") {
+    this->status = s;
+    this->duration = d;
+    this->uid = u;
+  }
+
+  bool getStatus() { return this->status; }
+  unsigned int getDuration() { return this->duration; }
+  String getUid() { return this->uid; }
+};
 
 void connectClient() {
   delay(TIMEOUT);
@@ -102,4 +141,14 @@ void onEventsCallback(WebsocketsEvent event, String data) {
   } else if (event == WebsocketsEvent::GotPong) {
     Serial.println("Got a Pong!");
   }
+}
+
+
+String getUid(byte *buffer, byte bufferSize) {
+  String uid = "";
+  for (byte i = 0; i < bufferSize; i++) {
+    uid += String(buffer[i], HEX);
+  }
+  uid.toUpperCase();
+  return uid;
 }
