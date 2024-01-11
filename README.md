@@ -4,6 +4,16 @@
 
 The Electronic Shelf Label (ESL) project aims to streamline and enhance the retail shopping experience by addressing common challenges faced by customers in hypermarkets and departmental stores. The primary issues include manual updating of prices and offers, leading to customer frustration, and long checkout lines.
 
+## Images
+
+### ESL
+
+![ESL](./images/esl.png)
+
+### Web Interface for the owner
+
+![OwnerInterface](./images/web_interface.png)
+
 ## Key Features
 
 - **Real-time Price Updates**: Automatic and instant updates of product prices and offers.
