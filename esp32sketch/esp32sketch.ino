@@ -7,6 +7,24 @@
 
 using namespace websockets;
 
+class Response {
+private:
+  bool status;
+  unsigned int duration;
+  String uid;
+
+public:
+  Response(bool s, unsigned int d = 0, String u = "") {
+    this->status = s;
+    this->duration = d;
+    this->uid = u;
+  }
+
+  bool getStatus() { return this->status; }
+  unsigned int getDuration() { return this->duration; }
+  String getUid() { return this->uid; }
+};
+
 /*
   RFID.RST -> ESP32.D4
   RFID.SDA -> ESP32.D5
@@ -31,11 +49,13 @@ WebsocketsClient client;
 MFRC522 rfid(SS_PIN, RST_PIN); // Create MFRC522 instance
 
 /* Prototypes */
-class Response;
 void connectClient();
 void onMessageCallback(WebsocketsMessage message);
 void onEventsCallback(WebsocketsEvent event, String data);
 String getUid(byte *buffer, byte bufferSize);
+unsigned long lastReadTime = 0;
+unsigned long cardStartTime = 0;
+Response getRfidResponse();
 
 void setup() {
   Serial.begin(BAUD_RATE);
@@ -87,25 +107,16 @@ void setup() {
   Serial.println(F("Scan PICC to see UID, SAK, type, and data blocks..."));
 }
 
-void loop() { client.poll(); }
-
-class Response {
-private:
-  bool status;
-  unsigned int duration;
-  String uid;
-
-public:
-  Response(bool s, unsigned int d = 0, String u = "") {
-    this->status = s;
-    this->duration = d;
-    this->uid = u;
+void loop() {
+  client.poll();
+  Response resp = getRfidResponse();
+  if (resp.getStatus()) {
+    Serial.print("UID:");
+    Serial.print(resp.getUid());
+    Serial.print(" stayed for ");
+    Serial.println(resp.getDuration());
   }
-
-  bool getStatus() { return this->status; }
-  unsigned int getDuration() { return this->duration; }
-  String getUid() { return this->uid; }
-};
+}
 
 void connectClient() {
   delay(TIMEOUT);
@@ -143,7 +154,6 @@ void onEventsCallback(WebsocketsEvent event, String data) {
   }
 }
 
-
 String getUid(byte *buffer, byte bufferSize) {
   String uid = "";
   for (byte i = 0; i < bufferSize; i++) {
@@ -152,3 +162,37 @@ String getUid(byte *buffer, byte bufferSize) {
   uid.toUpperCase();
   return uid;
 }
+
+Response getRfidResponse() {
+  String uid;
+  while (true) {
+    if (!rfid.PICC_IsNewCardPresent() || !rfid.PICC_ReadCardSerial()) {
+      delay(10);
+      if (cardStartTime == 0) {
+        // this part happens when nothing is going on
+        // Serial.println("happens when nothing is going on");
+        delay(50);
+        return Response(false);
+      }
+      unsigned long currTime = millis();
+      unsigned long timeSinceLastRead = currTime - lastReadTime;
+      if (timeSinceLastRead > 50) {
+        // means that we have been here since quite a while since the last read,
+        // and it means that our card has probably been left.
+        // ending our function
+        unsigned long totalTime = currTime - cardStartTime;
+        cardStartTime = 0;
+        return Response(true, totalTime, uid);
+      }
+      return Response(false);
+    }
+    if (cardStartTime == 0) {
+      cardStartTime = millis();
+      // happens when the card is bought near for the first time;
+      uid = getUid(rfid.uid.uidByte, rfid.uid.size);
+      Serial.println("Started detecting RFID");
+    }
+    lastReadTime = millis();
+  }
+  return Response(false);
+};
