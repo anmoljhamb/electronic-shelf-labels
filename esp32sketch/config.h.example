@@ -1,0 +1,8 @@
+// config.h
+#ifndef CONFIG_H
+#define CONFIG_H
+
+#define WIFI_SSID "wifiName"
+#define WIFI_PASSWORD "wifiPassword"
+
+#endif // CONFIG_H
