@@ -54,25 +54,44 @@ class Socket {
 private:
   WebsocketsClient client;
   String url;
+  String name;
 
 public:
-  Socket(String url) { this->url = url; }
+  Socket(String url, String name) {
+    this->url = url;
+    this->name = name;
+    client.onEvent([this](WebsocketsEvent event, String data) {
+      if (event == WebsocketsEvent::ConnectionOpened) {
+        Serial.println("Connnection Opened on Socket " + this->name);
+      } else if (event == WebsocketsEvent::ConnectionClosed) {
+        Serial.print("Connnection Closed on Socket" + this->name +
+                     ". Retring in ");
+        Serial.println(TIMEOUT);
+        delay(TIMEOUT);
+        connect();
+      } else if (event == WebsocketsEvent::GotPing) {
+        Serial.println(this->name + " socket Got a Ping!");
+      } else if (event == WebsocketsEvent::GotPong) {
+        Serial.println(this->name + " socket Got a Pong!");
+      }
+    });
+  }
 
   void connect() {
     delay(TIMEOUT);
-    Serial.println("Connecting to the client on url: " + this->url);
+    Serial.println(name + "Socket Connecting to the client on url: " + url);
     lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print("Connecting...");
-    this->client.addHeader("product_id", PRODUCT_ID);
-    bool status = this->client.connect(url);
+    client.addHeader("product_id", PRODUCT_ID);
+    bool status = client.connect(url);
     if (!status) {
-      this->connect();
+      connect();
     } else {
       lcd.clear();
       lcd.setCursor(2, 0);
       lcd.print("Connected...");
-      Serial.println("Socket Connected.");
+      Serial.println(name + " Socket Connected.");
     }
   }
 };
@@ -88,13 +107,12 @@ public:
 */
 
 /* Defining Sockets */
-Socket priceSocket(PRICE_URL);
+Socket priceSocket(PRICE_URL, "Price");
 
 /* Prototypes */
 void showPrice();
 void connectClient(String url);
 void onPriceMessageCallback(WebsocketsMessage message);
-void onPriceEventsCallback(WebsocketsEvent event, String data);
 String getUid(byte *buffer, byte bufferSize);
 unsigned long lastReadTime = 0;
 unsigned long cardStartTime = 0;
@@ -136,10 +154,6 @@ void setup() {
   // priceClient.onEvent(onPriceEventsCallback);
 
   priceSocket.connect();
-
-  // connectClient(PRICE_URL);
-  // priceClient.send("Hi Server!");
-  // priceClient.ping();
 
   delay(3000);
   SPI.begin();     // Init SPI bus
@@ -196,21 +210,6 @@ void onPriceMessageCallback(WebsocketsMessage message) {
   Serial.print("Got Message: ");
   price = message.data();
   showPrice();
-}
-
-void onPriceEventsCallback(WebsocketsEvent event, String data) {
-  if (event == WebsocketsEvent::ConnectionOpened) {
-    Serial.println("Connnection Opened");
-  } else if (event == WebsocketsEvent::ConnectionClosed) {
-    Serial.print("Connnection Closed. Retring in ");
-    Serial.println(TIMEOUT);
-    delay(TIMEOUT);
-    connectClient(PRICE_URL);
-  } else if (event == WebsocketsEvent::GotPing) {
-    Serial.println("Got a Ping!");
-  } else if (event == WebsocketsEvent::GotPong) {
-    Serial.println("Got a Pong!");
-  }
 }
 
 String getUid(byte *buffer, byte bufferSize) {
