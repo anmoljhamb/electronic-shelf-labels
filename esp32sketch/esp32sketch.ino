@@ -7,20 +7,26 @@
 
 using namespace websockets;
 
+enum RfidStatus {
+  DIDNT_DETECT,
+  DETECTED,
+  TIMEDOUT,
+};
+
 class Response {
 private:
-  bool status;
+  RfidStatus status;
   unsigned int duration;
   String uid;
 
 public:
-  Response(bool s, unsigned int d = 0, String u = "") {
+  Response(RfidStatus s, unsigned int d = 0, String u = "") {
     this->status = s;
     this->duration = d;
     this->uid = u;
   }
 
-  bool getStatus() { return this->status; }
+  RfidStatus getStatus() { return this->status; }
   unsigned int getDuration() { return this->duration; }
   String getUid() { return this->uid; }
 };
@@ -52,7 +58,7 @@ MFRC522 rfid(SS_PIN, RST_PIN); // Create MFRC522 instance
 String price;
 
 /* Prototypes */
-void showPrice(String resp);
+void showPrice();
 void connectClient();
 void onMessageCallback(WebsocketsMessage message);
 void onEventsCallback(WebsocketsEvent event, String data);
@@ -114,12 +120,25 @@ void setup() {
 void loop() {
   priceClient.poll();
   Response resp = getRfidResponse();
-  if (resp.getStatus()) {
-    Serial.print("UID:");
-    Serial.print(resp.getUid());
-    Serial.print(" stayed for ");
-    Serial.println(resp.getDuration());
+  RfidStatus status = resp.getStatus();
+  switch (status) {
+  case DIDNT_DETECT:
+    return;
+  case TIMEDOUT:
+    Serial.println("Timed Out!");
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Timed Out!");
+    lcd.setCursor(0, 1);
+    lcd.print("Try again.");
+    delay(3000);
+    showPrice();
+    return;
   }
+  Serial.print("UID:");
+  Serial.print(resp.getUid());
+  Serial.print(" stayed for ");
+  Serial.println(resp.getDuration());
 }
 
 void connectClient() {
@@ -141,7 +160,7 @@ void connectClient() {
 void onMessageCallback(WebsocketsMessage message) {
   Serial.print("Got Message: ");
   price = message.data();
-  showPrice(price);
+  showPrice();
 }
 
 void onEventsCallback(WebsocketsEvent event, String data) {
@@ -177,27 +196,24 @@ Response getRfidResponse() {
         // this part happens when nothing is going on
         // Serial.println("happens when nothing is going on");
         delay(50);
-        return Response(false);
+        return Response(DIDNT_DETECT);
       }
       unsigned long currTime = millis();
       unsigned long timeSinceLastRead = currTime - lastReadTime;
       unsigned long totalTime = currTime - cardStartTime;
       // This part takes place while it's being sensed.
-
-      if (totalTime > RFID_TIMEOUT) {
-        Serial.println("Timed out");
-        cardStartTime = 0;
-        return Response(false);
-      }
-
       if (timeSinceLastRead > 50) {
         // means that we have been here since quite a while since the last read,
         // and it means that our card has probably been left.
         // ending our function
+        if (totalTime > RFID_TIMEOUT) {
+          cardStartTime = 0;
+          return Response(TIMEDOUT);
+        }
         cardStartTime = 0;
-        return Response(true, totalTime, uid);
+        return Response(DETECTED, totalTime, uid);
       }
-      return Response(false);
+      return Response(DIDNT_DETECT);
     }
     if (cardStartTime == 0) {
       cardStartTime = millis();
@@ -207,14 +223,14 @@ Response getRfidResponse() {
     }
     lastReadTime = millis();
   }
-  return Response(false);
+  return Response(DIDNT_DETECT);
 };
 
-void showPrice(String resp) {
+void showPrice() {
   lcd.clear();
   lcd.setCursor(0, 0);
   lcd.print("Price");
   lcd.setCursor(0, 1);
-  lcd.print("$" + resp);
-  Serial.println(resp);
+  lcd.print("$" + price);
+  Serial.println(price);
 }
