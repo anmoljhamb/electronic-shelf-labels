@@ -9,6 +9,7 @@ import { priceWs } from "./api/v1/sockets/price";
 import mongoose from "mongoose";
 import morgan from "morgan";
 import { Communication } from "./api/utils/communication";
+import { cartWs } from "./api/v1/sockets/cart";
 
 dotenv.config({ path: path.join(__dirname, "..", "config.env") });
 
@@ -41,6 +42,7 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
 server.on("upgrade", (req, socket, head) => {
   let pathname = req.url as string;
   const productId = req.headers.product_id as string;
+  console.log(req.headers);
   console.log(
     `Recvd a socket upgrade req on ${req.url} by product ${productId}`,
   );
@@ -51,6 +53,12 @@ server.on("upgrade", (req, socket, head) => {
       priceWs.handleUpgrade(req, socket, head, (ws) => {
         Communication.addSocket(productId, ws);
         priceWs.emit("connection", ws, req);
+      });
+    } else if (pathname === "/cart") {
+      // todo add one more communication for the cart web socket
+      cartWs.handleUpgrade(req, socket, head, (ws) => {
+        Communication.addSocket(productId, ws);
+        cartWs.emit("connection", ws, req);
       });
     }
   }
