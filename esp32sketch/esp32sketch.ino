@@ -45,6 +45,7 @@ public:
 const int BAUD_RATE = 115200;
 const String HOST = "ws://192.168.1.7:8080/api/v1/products/sockets";
 const String PRICE_PATH = "/price";
+const String PRICE_URL = HOST + PRICE_PATH;
 const String PRODUCT_ID = "pid-1";
 const int TIMEOUT = 2000;
 const byte RST_PIN = 4;
@@ -59,9 +60,9 @@ String price;
 
 /* Prototypes */
 void showPrice();
-void connectClient();
-void onMessageCallback(WebsocketsMessage message);
-void onEventsCallback(WebsocketsEvent event, String data);
+void connectClient(String url);
+void onPriceMessageCallback(WebsocketsMessage message);
+void onPriceEventsCallback(WebsocketsEvent event, String data);
 String getUid(byte *buffer, byte bufferSize);
 unsigned long lastReadTime = 0;
 unsigned long cardStartTime = 0;
@@ -99,11 +100,10 @@ void setup() {
   lcd.clear();
   lcd.setCursor(2, 0);
 
-  priceClient.onMessage(onMessageCallback);
-  priceClient.onEvent(onEventsCallback);
+  priceClient.onMessage(onPriceMessageCallback);
+  priceClient.onEvent(onPriceEventsCallback);
 
-  priceClient.addHeader("product_id", PRODUCT_ID);
-  connectClient();
+  connectClient(PRICE_URL);
   priceClient.send("Hi Server!");
   priceClient.ping();
 
@@ -141,15 +141,16 @@ void loop() {
   Serial.println(resp.getDuration());
 }
 
-void connectClient() {
+void connectClient(String url) {
   delay(TIMEOUT);
   Serial.println("Connecting to the client...");
   lcd.clear();
   lcd.setCursor(0, 0);
   lcd.print("Connecting...");
-  bool status = priceClient.connect(HOST + PRICE_PATH);
+  priceClient.addHeader("product_id", PRODUCT_ID);
+  bool status = priceClient.connect(url);
   if (!status) {
-    connectClient();
+    connectClient(url);
   } else {
     lcd.clear();
     lcd.setCursor(2, 0);
@@ -157,20 +158,20 @@ void connectClient() {
   }
 }
 
-void onMessageCallback(WebsocketsMessage message) {
+void onPriceMessageCallback(WebsocketsMessage message) {
   Serial.print("Got Message: ");
   price = message.data();
   showPrice();
 }
 
-void onEventsCallback(WebsocketsEvent event, String data) {
+void onPriceEventsCallback(WebsocketsEvent event, String data) {
   if (event == WebsocketsEvent::ConnectionOpened) {
     Serial.println("Connnection Opened");
   } else if (event == WebsocketsEvent::ConnectionClosed) {
     Serial.print("Connnection Closed. Retring in ");
     Serial.println(TIMEOUT);
     delay(TIMEOUT);
-    connectClient();
+    connectClient(PRICE_URL);
   } else if (event == WebsocketsEvent::GotPing) {
     Serial.println("Got a Ping!");
   } else if (event == WebsocketsEvent::GotPong) {
