@@ -43,13 +43,16 @@ const String PRODUCT_ID = "pid-1";
 const int TIMEOUT = 2000;
 const byte RST_PIN = 4;
 const byte SS_PIN = 5;
+const int RFID_TIMEOUT = 10000;
 
 /* Global Variables */
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 WebsocketsClient priceClient;
 MFRC522 rfid(SS_PIN, RST_PIN); // Create MFRC522 instance
+String price;
 
 /* Prototypes */
+void showPrice(String resp);
 void connectClient();
 void onMessageCallback(WebsocketsMessage message);
 void onEventsCallback(WebsocketsEvent event, String data);
@@ -137,13 +140,8 @@ void connectClient() {
 
 void onMessageCallback(WebsocketsMessage message) {
   Serial.print("Got Message: ");
-  String resp = message.data();
-  lcd.clear();
-  lcd.setCursor(0, 0);
-  lcd.print("Price");
-  lcd.setCursor(0, 1);
-  lcd.print("$" + resp);
-  Serial.println(resp);
+  price = message.data();
+  showPrice(price);
 }
 
 void onEventsCallback(WebsocketsEvent event, String data) {
@@ -183,11 +181,19 @@ Response getRfidResponse() {
       }
       unsigned long currTime = millis();
       unsigned long timeSinceLastRead = currTime - lastReadTime;
+      unsigned long totalTime = currTime - cardStartTime;
+      // This part takes place while it's being sensed.
+
+      if (totalTime > RFID_TIMEOUT) {
+        Serial.println("Timed out");
+        cardStartTime = 0;
+        return Response(false);
+      }
+
       if (timeSinceLastRead > 50) {
         // means that we have been here since quite a while since the last read,
         // and it means that our card has probably been left.
         // ending our function
-        unsigned long totalTime = currTime - cardStartTime;
         cardStartTime = 0;
         return Response(true, totalTime, uid);
       }
@@ -203,3 +209,12 @@ Response getRfidResponse() {
   }
   return Response(false);
 };
+
+void showPrice(String resp) {
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Price");
+  lcd.setCursor(0, 1);
+  lcd.print("$" + resp);
+  Serial.println(resp);
+}
