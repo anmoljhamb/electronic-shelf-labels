@@ -7,6 +7,25 @@
 
 using namespace websockets;
 
+/* Constants */
+const int BAUD_RATE = 115200;
+const String HOST = "ws://192.168.1.7:8080/api/v1/products/sockets";
+const String PRICE_PATH = "/price";
+const String PRICE_URL = HOST + PRICE_PATH;
+const String PRODUCT_ID = "pid-1";
+const int TIMEOUT = 2000;
+const byte RST_PIN = 4;
+const byte SS_PIN = 5;
+const int RFID_TIMEOUT = 10000;
+
+/* Global Variables */
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+WebsocketsClient priceClient;
+MFRC522 rfid(SS_PIN, RST_PIN); // Create MFRC522 instance
+String price;
+
+/* User defined datastructures */
+
 enum RfidStatus {
   DIDNT_DETECT,
   DETECTED,
@@ -31,6 +50,33 @@ public:
   String getUid() { return this->uid; }
 };
 
+class Socket {
+private:
+  WebsocketsClient client;
+  String url;
+
+public:
+  Socket(String url) { this->url = url; }
+
+  void connect() {
+    delay(TIMEOUT);
+    Serial.println("Connecting to the client on url: " + this->url);
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Connecting...");
+    this->client.addHeader("product_id", PRODUCT_ID);
+    bool status = this->client.connect(url);
+    if (!status) {
+      this->connect();
+    } else {
+      lcd.clear();
+      lcd.setCursor(2, 0);
+      lcd.print("Connected...");
+      Serial.println("Socket Connected.");
+    }
+  }
+};
+
 /*
   RFID.RST -> ESP32.D4
   RFID.SDA -> ESP32.D5
@@ -41,22 +87,8 @@ public:
   RFID.MISO -> ESP32.D23
 */
 
-/* Constants */
-const int BAUD_RATE = 115200;
-const String HOST = "ws://192.168.1.7:8080/api/v1/products/sockets";
-const String PRICE_PATH = "/price";
-const String PRICE_URL = HOST + PRICE_PATH;
-const String PRODUCT_ID = "pid-1";
-const int TIMEOUT = 2000;
-const byte RST_PIN = 4;
-const byte SS_PIN = 5;
-const int RFID_TIMEOUT = 10000;
-
-/* Global Variables */
-LiquidCrystal_I2C lcd(0x27, 16, 2);
-WebsocketsClient priceClient;
-MFRC522 rfid(SS_PIN, RST_PIN); // Create MFRC522 instance
-String price;
+/* Defining Sockets */
+Socket priceSocket(PRICE_URL);
 
 /* Prototypes */
 void showPrice();
@@ -100,12 +132,14 @@ void setup() {
   lcd.clear();
   lcd.setCursor(2, 0);
 
-  priceClient.onMessage(onPriceMessageCallback);
-  priceClient.onEvent(onPriceEventsCallback);
+  // priceClient.onMessage(onPriceMessageCallback);
+  // priceClient.onEvent(onPriceEventsCallback);
 
-  connectClient(PRICE_URL);
-  priceClient.send("Hi Server!");
-  priceClient.ping();
+  priceSocket.connect();
+
+  // connectClient(PRICE_URL);
+  // priceClient.send("Hi Server!");
+  // priceClient.ping();
 
   delay(3000);
   SPI.begin();     // Init SPI bus
