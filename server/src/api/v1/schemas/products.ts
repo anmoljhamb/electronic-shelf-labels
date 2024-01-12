@@ -35,7 +35,7 @@ productSchema.pre("save", async function (next) {
 productSchema.post("findOneAndUpdate", function (doc) {
   console.log(`Update price for productId: ${doc.productId}`);
   const socket = Communication.getSocket(doc.productId);
-  socket.send(`UP: ${doc.price}`);
+  socket.send(doc.price);
 });
 
 export const Products = mongoose.model("product", productSchema);

@@ -38,6 +38,7 @@ public:
 /* Constants */
 const int BAUD_RATE = 115200;
 const String HOST = "ws://192.168.1.7:8080/api/v1/products/sockets";
+const String PRICE_PATH = "/price";
 const String PRODUCT_ID = "pid-1";
 const int TIMEOUT = 2000;
 const byte RST_PIN = 4;
@@ -45,7 +46,7 @@ const byte SS_PIN = 5;
 
 /* Global Variables */
 LiquidCrystal_I2C lcd(0x27, 16, 2);
-WebsocketsClient client;
+WebsocketsClient priceClient;
 MFRC522 rfid(SS_PIN, RST_PIN); // Create MFRC522 instance
 
 /* Prototypes */
@@ -89,13 +90,13 @@ void setup() {
   lcd.clear();
   lcd.setCursor(2, 0);
 
-  client.onMessage(onMessageCallback);
-  client.onEvent(onEventsCallback);
+  priceClient.onMessage(onMessageCallback);
+  priceClient.onEvent(onEventsCallback);
 
-  client.addHeader("product_id", PRODUCT_ID);
+  priceClient.addHeader("product_id", PRODUCT_ID);
   connectClient();
-  client.send("Hi Server!");
-  client.ping();
+  priceClient.send("Hi Server!");
+  priceClient.ping();
 
   delay(3000);
   SPI.begin();     // Init SPI bus
@@ -108,7 +109,7 @@ void setup() {
 }
 
 void loop() {
-  client.poll();
+  priceClient.poll();
   Response resp = getRfidResponse();
   if (resp.getStatus()) {
     Serial.print("UID:");
@@ -121,11 +122,11 @@ void loop() {
 void connectClient() {
   delay(TIMEOUT);
   Serial.println("Connecting to the client...");
-  bool status = client.connect(HOST);
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Connecting...");
+  bool status = priceClient.connect(HOST + PRICE_PATH);
   if (!status) {
-    lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print("Connecting...");
     connectClient();
   } else {
     lcd.clear();
@@ -136,7 +137,13 @@ void connectClient() {
 
 void onMessageCallback(WebsocketsMessage message) {
   Serial.print("Got Message: ");
-  Serial.println(message.data());
+  String resp = message.data();
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Price");
+  lcd.setCursor(0, 1);
+  lcd.print("$" + resp);
+  Serial.println(resp);
 }
 
 void onEventsCallback(WebsocketsEvent event, String data) {

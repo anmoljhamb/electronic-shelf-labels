@@ -5,7 +5,7 @@ import createHttpError from "http-errors";
 import { ReasonPhrases } from "http-status-codes";
 import path from "path";
 import { apiRouter } from "./api/v1";
-import { echoWs } from "./api/v1/sockets/echo";
+import { priceWs } from "./api/v1/sockets/price";
 import mongoose from "mongoose";
 import morgan from "morgan";
 import { Communication } from "./api/utils/communication";
@@ -17,6 +17,7 @@ const DATABASE_URI =
   process.env.DATABASE_URI || "mongodb://127.0.0.1:27017/esl";
 const app = express();
 const server = createServer(app);
+const SOCKET_PATH = "/api/v1/products/sockets";
 
 // Middlewares
 app.use(morgan("dev"));
@@ -38,17 +39,20 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
 });
 
 server.on("upgrade", (req, socket, head) => {
-  const pathname = req.url as string;
+  let pathname = req.url as string;
   const productId = req.headers.product_id as string;
   console.log(
     `Recvd a socket upgrade req on ${req.url} by product ${productId}`,
   );
 
-  if (pathname === "/api/v1/products/sockets") {
-    echoWs.handleUpgrade(req, socket, head, (ws) => {
-      Communication.addSocket(productId, ws);
-      echoWs.emit("connection", ws, req);
-    });
+  if (pathname.startsWith(SOCKET_PATH)) {
+    pathname = pathname.slice(SOCKET_PATH.length);
+    if (pathname === "/price") {
+      priceWs.handleUpgrade(req, socket, head, (ws) => {
+        Communication.addSocket(productId, ws);
+        priceWs.emit("connection", ws, req);
+      });
+    }
   }
 });
 

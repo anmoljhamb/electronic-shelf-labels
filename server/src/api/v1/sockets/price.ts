@@ -3,9 +3,9 @@ import { Communication } from "../../utils/communication";
 import { Products } from "../schemas/products";
 import createHttpError from "http-errors";
 
-export const echoWs = new ws.WebSocketServer({ noServer: true });
+export const priceWs = new ws.WebSocketServer({ noServer: true });
 
-echoWs.on("connection", async (socket, req) => {
+priceWs.on("connection", async (socket, req) => {
   // Todo Add an interval to check for heart beat, as shown in documentation
   const productId = req.headers.product_id as string;
   console.log(`Recvd a socket req on by product ${productId}`);
