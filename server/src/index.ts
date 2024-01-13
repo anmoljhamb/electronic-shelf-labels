@@ -5,11 +5,9 @@ import createHttpError from "http-errors";
 import { ReasonPhrases } from "http-status-codes";
 import path from "path";
 import { apiRouter } from "./api/v1";
-import { priceWs } from "./api/v1/sockets/price";
+import { priceCom, priceWs } from "./api/v1/sockets/price";
 import mongoose from "mongoose";
 import morgan from "morgan";
-import { Communication } from "./api/utils/communication";
-import { cartWs } from "./api/v1/sockets/cart";
 
 dotenv.config({ path: path.join(__dirname, "..", "config.env") });
 
@@ -50,14 +48,8 @@ server.on("upgrade", (req, socket, head) => {
     pathname = pathname.slice(SOCKET_PATH.length);
     if (pathname === "/price") {
       priceWs.handleUpgrade(req, socket, head, (ws) => {
-        Communication.addSocket(productId, ws);
+        priceCom.addSocket(productId, ws);
         priceWs.emit("connection", ws, req);
-      });
-    } else if (pathname === "/cart") {
-      // todo add one more communication for the cart web socket
-      cartWs.handleUpgrade(req, socket, head, (ws) => {
-        Communication.addSocket(productId, ws);
-        cartWs.emit("connection", ws, req);
       });
     }
   }

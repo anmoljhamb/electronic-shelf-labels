@@ -1,7 +1,7 @@
 import createHttpError from "http-errors";
 import mongoose from "mongoose";
 import { IProduct } from "../types";
-import { Communication } from "../../utils/communication";
+import { priceCom } from "../sockets/price";
 
 const productSchema = new mongoose.Schema<IProduct>({
   title: {
@@ -34,7 +34,7 @@ productSchema.pre("save", async function (next) {
 
 productSchema.post("findOneAndUpdate", function (doc) {
   console.log(`Update price for productId: ${doc.productId}`);
-  const socket = Communication.getSocket(doc.productId);
+  const socket = priceCom.getSocket(doc.productId);
   socket.send(doc.price);
 });
 
