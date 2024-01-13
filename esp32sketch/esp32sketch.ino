@@ -61,6 +61,7 @@ public:
   Socket(String url, String name) {
     this->url = url;
     this->name = name;
+    client.addHeader("product_id", PRODUCT_ID);
     client.onEvent([this](WebsocketsEvent event, String data) {
       if (event == WebsocketsEvent::ConnectionOpened) {
         Serial.println("Connnection Opened on Socket " + this->name);
@@ -84,7 +85,6 @@ public:
     lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print("Connecting...");
-    client.addHeader("product_id", PRODUCT_ID);
     bool status = client.connect(url);
     if (!status) {
       connect();
