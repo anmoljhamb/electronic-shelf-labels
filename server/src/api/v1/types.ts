@@ -5,3 +5,8 @@ export type IProduct = {
   productId: string;
   prevPrice: number;
 };
+
+export type RFIDResponse = {
+  duration: number;
+  uid: string;
+};

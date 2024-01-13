@@ -1,5 +1,7 @@
 import ws from "ws";
 import { Communication } from "../../utils/communication";
+import { RFIDResponse } from "../types";
+import { TAKE_LIMIT, LOWER_LIMIT } from "../constants";
 
 export const cartWs = new ws.WebSocketServer({ noServer: true });
 export const cartCom = new Communication();
@@ -11,7 +13,15 @@ cartWs.on("connection", async (socket, req) => {
   cartCom.addSocket(productId, socket);
 
   socket.on("message", (msg) => {
-    console.log("recieved message:", msg.toString());
+    const data: RFIDResponse = JSON.parse(msg.toString());
+    console.log("recieved data:", data);
+    if (data.duration <= LOWER_LIMIT) {
+      socket.send("IGNORE");
+    } else if (data.duration <= TAKE_LIMIT) {
+      socket.send("TAKE");
+    } else {
+      socket.send("REMOVE");
+    }
   });
 
   socket.on("close", () => {
@@ -26,4 +36,6 @@ cartWs.on("connection", async (socket, req) => {
   socket.on("unexpected-response", (resp) => {
     console.log(resp);
   });
+
+  socket.send("Hello from server.");
 });

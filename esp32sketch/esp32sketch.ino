@@ -1,9 +1,14 @@
 #include "config.h"
+#include <ArduinoJson.h>
 #include <ArduinoWebsockets.h>
 #include <LiquidCrystal_I2C.h>
 #include <MFRC522.h>
 #include <SPI.h>
 #include <WiFi.h>
+
+/*
+  TODO Add the option for checking the heartbeat of connection.
+*/
 
 using namespace websockets;
 
@@ -11,7 +16,9 @@ using namespace websockets;
 const int BAUD_RATE = 115200;
 const String HOST = "ws://192.168.1.6:8080/api/v1/products/sockets";
 const String PRICE_PATH = "/price";
+const String CART_PATH = "/cart";
 const String PRICE_URL = HOST + PRICE_PATH;
+const String CART_URL = HOST + CART_PATH;
 const String PRODUCT_ID = "pid-1";
 const int TIMEOUT = 2000;
 const byte RST_PIN = 4;
@@ -121,8 +128,10 @@ public:
 
 /* Defining Sockets */
 Socket priceSocket(PRICE_URL, "Price");
+Socket cartSocket(CART_URL, "Cart");
 
 /* Prototypes */
+void handleCart(String data);
 void handlePrice(String data);
 void showPrice();
 void connectClient(String url);
@@ -165,6 +174,9 @@ void setup() {
   priceSocket.connect();
   priceSocket.sendMessage("Hello Server!");
 
+  cartSocket.setMessageHandler(handleCart);
+  cartSocket.connect();
+
   delay(3000);
   SPI.begin();     // Init SPI bus
   rfid.PCD_Init(); // Init MFRC522
@@ -177,6 +189,7 @@ void setup() {
 
 void loop() {
   priceSocket.startPolling();
+  cartSocket.startPolling();
   Response resp = getRfidResponse();
   RfidStatus status = resp.getStatus();
   switch (status) {
@@ -193,6 +206,14 @@ void loop() {
     showPrice();
     return;
   }
+  StaticJsonDocument<200> doc;
+  doc["uid"] = resp.getUid();
+  doc["duration"] = resp.getDuration();
+
+  String jsonStr;
+  serializeJson(doc, jsonStr);
+
+  cartSocket.sendMessage(jsonStr);
   Serial.print("UID:");
   Serial.print(resp.getUid());
   Serial.print(" stayed for ");
@@ -201,6 +222,24 @@ void loop() {
 
 void handlePrice(String data) {
   price = data;
+  showPrice();
+}
+
+void handleCart(String data) {
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  if (data == "IGNORE") {
+    lcd.print("Try Again.");
+  } else if (data == "TAKE") {
+    lcd.print("Added to");
+    lcd.setCursor(0, 1);
+    lcd.print("Cart");
+  } else if (data == "REMOVE") {
+    lcd.print("Removed From");
+    lcd.setCursor(0, 1);
+    lcd.print("Cart");
+  }
+  delay(2500);
   showPrice();
 }
 
@@ -214,7 +253,7 @@ String getUid(byte *buffer, byte bufferSize) {
 }
 
 Response getRfidResponse() {
-  String uid;
+  String uid = getUid(rfid.uid.uidByte, rfid.uid.size);
   while (true) {
     if (!rfid.PICC_IsNewCardPresent() || !rfid.PICC_ReadCardSerial()) {
       delay(10);
