@@ -42,7 +42,6 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
 server.on("upgrade", (req, socket, head) => {
   let pathname = req.url as string;
   const productId = req.headers.product_id as string;
-  console.log(req.headers);
   console.log(
     `Recvd a socket upgrade req on ${req.url} by product ${productId}`,
   );

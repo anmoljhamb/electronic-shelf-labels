@@ -9,7 +9,7 @@ using namespace websockets;
 
 /* Constants */
 const int BAUD_RATE = 115200;
-const String HOST = "ws://192.168.1.7:8080/api/v1/products/sockets";
+const String HOST = "ws://192.168.1.6:8080/api/v1/products/sockets";
 const String PRICE_PATH = "/price";
 const String PRICE_URL = HOST + PRICE_PATH;
 const String PRODUCT_ID = "pid-1";
@@ -52,11 +52,12 @@ public:
 
 class Socket {
 private:
-  WebsocketsClient client;
   String url;
   String name;
+  void *handleMessage(String);
 
 public:
+  WebsocketsClient client;
   Socket(String url, String name) {
     this->url = url;
     this->name = name;
@@ -94,6 +95,18 @@ public:
       Serial.println(name + " Socket Connected.");
     }
   }
+
+  void setMessageHandler(std::function<void(String)> handler) {
+    client.onMessage([this, handler](WebsocketsMessage msg) {
+      Serial.print(name + " socket got message: ");
+      Serial.println(msg.data());
+      handler(msg.data());
+    });
+  }
+
+  void startPolling() { client.poll(); }
+
+  void sendMessage(String msg) { client.send(msg); }
 };
 
 /*
@@ -110,6 +123,7 @@ public:
 Socket priceSocket(PRICE_URL, "Price");
 
 /* Prototypes */
+void handlePrice(String data);
 void showPrice();
 void connectClient(String url);
 void onPriceMessageCallback(WebsocketsMessage message);
@@ -147,13 +161,9 @@ void setup() {
   Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
 
-  lcd.clear();
-  lcd.setCursor(2, 0);
-
-  // priceClient.onMessage(onPriceMessageCallback);
-  // priceClient.onEvent(onPriceEventsCallback);
-
+  priceSocket.setMessageHandler(handlePrice);
   priceSocket.connect();
+  priceSocket.sendMessage("Hello Server!");
 
   delay(3000);
   SPI.begin();     // Init SPI bus
@@ -166,7 +176,7 @@ void setup() {
 }
 
 void loop() {
-  priceClient.poll();
+  priceSocket.startPolling();
   Response resp = getRfidResponse();
   RfidStatus status = resp.getStatus();
   switch (status) {
@@ -189,26 +199,8 @@ void loop() {
   Serial.println(resp.getDuration());
 }
 
-void connectClient(String url) {
-  delay(TIMEOUT);
-  Serial.println("Connecting to the client...");
-  lcd.clear();
-  lcd.setCursor(0, 0);
-  lcd.print("Connecting...");
-  priceClient.addHeader("product_id", PRODUCT_ID);
-  bool status = priceClient.connect(url);
-  if (!status) {
-    connectClient(url);
-  } else {
-    lcd.clear();
-    lcd.setCursor(2, 0);
-    lcd.print("Connected...");
-  }
-}
-
-void onPriceMessageCallback(WebsocketsMessage message) {
-  Serial.print("Got Message: ");
-  price = message.data();
+void handlePrice(String data) {
+  price = data;
   showPrice();
 }
 
@@ -266,5 +258,4 @@ void showPrice() {
   lcd.print("Price");
   lcd.setCursor(0, 1);
   lcd.print("$" + price);
-  Serial.println(price);
 }
