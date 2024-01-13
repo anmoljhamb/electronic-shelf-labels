@@ -8,6 +8,7 @@ import { apiRouter } from "./api/v1";
 import { priceCom, priceWs } from "./api/v1/sockets/price";
 import mongoose from "mongoose";
 import morgan from "morgan";
+import { cartCom, cartWs } from "./api/v1/sockets/cart";
 
 dotenv.config({ path: path.join(__dirname, "..", "config.env") });
 
@@ -50,6 +51,11 @@ server.on("upgrade", (req, socket, head) => {
       priceWs.handleUpgrade(req, socket, head, (ws) => {
         priceCom.addSocket(productId, ws);
         priceWs.emit("connection", ws, req);
+      });
+    } else if (pathname === "/cart") {
+      cartWs.handleUpgrade(req, socket, head, (ws) => {
+        cartCom.addSocket(productId, ws);
+        cartWs.emit("connection", ws, req);
       });
     }
   }
