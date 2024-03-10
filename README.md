@@ -36,7 +36,3 @@ ESL is applicable in various retail environments, including:
 ## Future Scope
 
 The project has the potential to scale into a comprehensive service, incorporating multiple screens and RFID for each product. Additionally, there is an opportunity to establish local servers and introduce partial smart shopping services, further contributing to the advancement of the retail industry.
-
-## Acknowledgments
-
-We express our gratitude to [Acknowledged Person/Institution] for their valuable contributions and support throughout the development of this project.
