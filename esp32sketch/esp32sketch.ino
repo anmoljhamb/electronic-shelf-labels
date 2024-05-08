@@ -14,7 +14,7 @@ using namespace websockets;
 
 /* Constants */
 const int BAUD_RATE = 115200;
-const String HOST = "ws://192.168.1.6:8080/api/v1/products/sockets";
+const String HOST = "ws://192.168.1.2:8080/api/v1/products/sockets";
 const String PRICE_PATH = "/price";
 const String CART_PATH = "/cart";
 const String PRICE_URL = HOST + PRICE_PATH;
