@@ -2,6 +2,7 @@ import ws from "ws";
 import { Communication } from "../../utils/communication";
 import { RFIDResponse } from "../types";
 import { TAKE_LIMIT, LOWER_LIMIT } from "../constants";
+import { Carts } from "../schemas/carts";
 
 export const cartWs = new ws.WebSocketServer({ noServer: true });
 export const cartCom = new Communication();
@@ -12,14 +13,20 @@ cartWs.on("connection", async (socket, req) => {
   console.log(`Recvd a socket req on by product ${productId}`);
   cartCom.addSocket(productId, socket);
 
-  socket.on("message", (msg) => {
+  socket.on("message", async (msg) => {
     const data: RFIDResponse = JSON.parse(msg.toString());
     console.log("recieved data:", data);
     if (data.duration <= LOWER_LIMIT) {
       socket.send("IGNORE");
     } else if (data.duration <= TAKE_LIMIT) {
+      const cart = new Carts({ productId, userId: data.uid });
+      await cart.save();
       socket.send("TAKE");
     } else {
+      await Carts.findOneAndDelete({
+        productId,
+        userId: data.uid,
+      });
       socket.send("REMOVE");
     }
   });
