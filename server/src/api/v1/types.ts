@@ -3,7 +3,6 @@ export type IProduct = {
   desc: string;
   price: number;
   productId: string;
-  prevPrice: number;
 };
 
 export type RFIDResponse = {
