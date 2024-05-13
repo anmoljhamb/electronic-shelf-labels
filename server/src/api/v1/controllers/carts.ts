@@ -1,5 +1,5 @@
 import { Carts } from "../schemas/carts";
-import { IProduct } from "../types";
+import { IProduct, OrderDetail } from "../types";
 import { fetchProductById } from "./products";
 
 export const fetchUserTotalAndOrderDetails = async (userId: string) => {
@@ -28,12 +28,17 @@ export const fetchUserTotalAndOrderDetails = async (userId: string) => {
   });
 
   let total = 0;
+  const orderDetails: Record<string, OrderDetail> = {};
   carts.forEach((cart) => {
     const product = data[cart.productId!];
+    if (product.productId in orderDetails) {
+      orderDetails[product.productId]["qty"] += 1;
+    } else {
+      orderDetails[product.productId] = { item: product, qty: 1 };
+    }
     console.log(product);
     total += product.price;
   });
   console.log(total);
-  const orderDetails: never[] = [];
   return { total, orderDetails };
 };

@@ -9,3 +9,8 @@ export type RFIDResponse = {
   duration: number;
   uid: string;
 };
+
+export type OrderDetail = {
+  item: IProduct;
+  qty: number;
+};
