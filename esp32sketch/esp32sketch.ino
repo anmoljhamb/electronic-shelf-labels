@@ -28,7 +28,7 @@ const int RFID_TIMEOUT = 10000;
 /* Global Variables */
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 WebsocketsClient priceClient;
-MFRC522 rfid(SS_PIN, RST_PIN); // Create MFRC522 instance
+MFRC522 rfid(SS_PIN, RST_PIN);  // Create MFRC522 instance
 String price;
 
 /* User defined datastructures */
@@ -52,9 +52,15 @@ public:
     this->uid = u;
   }
 
-  RfidStatus getStatus() { return this->status; }
-  unsigned int getDuration() { return this->duration; }
-  String getUid() { return this->uid; }
+  RfidStatus getStatus() {
+    return this->status;
+  }
+  unsigned int getDuration() {
+    return this->duration;
+  }
+  String getUid() {
+    return this->uid;
+  }
 };
 
 class Socket {
@@ -73,8 +79,7 @@ public:
       if (event == WebsocketsEvent::ConnectionOpened) {
         Serial.println("Connnection Opened on Socket " + this->name);
       } else if (event == WebsocketsEvent::ConnectionClosed) {
-        Serial.print("Connnection Closed on Socket" + this->name +
-                     ". Retring in ");
+        Serial.print("Connnection Closed on Socket" + this->name + ". Retring in ");
         Serial.println(TIMEOUT);
         delay(TIMEOUT);
         connect();
@@ -111,9 +116,13 @@ public:
     });
   }
 
-  void startPolling() { client.poll(); }
+  void startPolling() {
+    client.poll();
+  }
 
-  void sendMessage(String msg) { client.send(msg); }
+  void sendMessage(String msg) {
+    client.send(msg);
+  }
 };
 
 /*
@@ -143,15 +152,14 @@ Response getRfidResponse();
 
 void setup() {
   Serial.begin(BAUD_RATE);
-  while (!Serial)
-    ;
+  while (!Serial);
   delay(3000);
 
   Serial.println("init app");
 
   lcd.init();
   lcd.clear();
-  lcd.backlight(); // Make sure backlight is on
+  lcd.backlight();  // Make sure backlight is on
   lcd.setCursor(1, 0);
   lcd.print("Initializing...");
 
@@ -178,12 +186,12 @@ void setup() {
   cartSocket.connect();
 
   delay(3000);
-  SPI.begin();     // Init SPI bus
-  rfid.PCD_Init(); // Init MFRC522
-  delay(4); // Optional delay. Some board do need more time after init to be
-            // ready, see Readme
-  rfid.PCD_DumpVersionToSerial(); // Show details of PCD - MFRC522 Card
-                                  // Reader details
+  SPI.begin();                     // Init SPI bus
+  rfid.PCD_Init();                 // Init MFRC522
+  delay(4);                        // Optional delay. Some board do need more time after init to be
+                                   // ready, see Readme
+  rfid.PCD_DumpVersionToSerial();  // Show details of PCD - MFRC522 Card
+                                   // Reader details
   Serial.println(F("Scan PICC to see UID, SAK, type, and data blocks..."));
 }
 
@@ -193,18 +201,18 @@ void loop() {
   Response resp = getRfidResponse();
   RfidStatus status = resp.getStatus();
   switch (status) {
-  case DIDNT_DETECT:
-    return;
-  case TIMEDOUT:
-    Serial.println("Timed Out!");
-    lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print("Timed Out!");
-    lcd.setCursor(0, 1);
-    lcd.print("Try again.");
-    delay(3000);
-    showPrice();
-    return;
+    case DIDNT_DETECT:
+      return;
+    case TIMEDOUT:
+      Serial.println("Timed Out!");
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print("Timed Out!");
+      lcd.setCursor(0, 1);
+      lcd.print("Try again.");
+      delay(3000);
+      showPrice();
+      return;
   }
   StaticJsonDocument<200> doc;
   doc["uid"] = resp.getUid();

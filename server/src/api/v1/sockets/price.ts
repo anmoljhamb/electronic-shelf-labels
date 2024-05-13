@@ -17,7 +17,7 @@ priceWs.on("connection", async (socket, req) => {
   });
 
   socket.on("close", () => {
-    console.log("closing the socket for ${productId}");
+    console.log(`closing the socket for ${productId}`);
     priceCom.removeSocket(productId);
   });
 
