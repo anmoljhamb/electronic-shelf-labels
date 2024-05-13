@@ -11,7 +11,7 @@ export const productRouter = Router();
 
 productRouter
   .get("/", fetchAllProducts)
-  .post("/", createNewProduct)
+  .post("/create-new", createNewProduct)
   .get("/:productId", fetchProductById)
   .delete("/:productId", deleteProductById)
   .patch("/:productId", updateProductById);
