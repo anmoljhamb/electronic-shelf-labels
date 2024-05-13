@@ -9,6 +9,7 @@ import { priceCom, priceWs } from "./api/v1/sockets/price";
 import mongoose from "mongoose";
 import morgan from "morgan";
 import { cartCom, cartWs } from "./api/v1/sockets/cart";
+import { clientWs } from "./api/v1/sockets/client";
 
 dotenv.config({ path: path.join(__dirname, "..", "config.env") });
 
@@ -17,7 +18,8 @@ const DATABASE_URI =
   process.env.DATABASE_URI || "mongodb://127.0.0.1:27017/esl";
 const app = express();
 const server = createServer(app);
-const SOCKET_PATH = "/api/v1/products/sockets";
+const PRODUCTS_SOCKET_PATH = "/api/v1/products/sockets";
+const CLIENTS_SOCKET_PATH = "/api/v1/clients/sockets";
 
 // Middlewares
 app.use(morgan("dev"));
@@ -45,8 +47,8 @@ server.on("upgrade", (req, socket, head) => {
     `Recvd a socket upgrade req on ${req.url} by product ${productId}`,
   );
 
-  if (pathname.startsWith(SOCKET_PATH)) {
-    pathname = pathname.slice(SOCKET_PATH.length);
+  if (pathname.startsWith(PRODUCTS_SOCKET_PATH)) {
+    pathname = pathname.slice(PRODUCTS_SOCKET_PATH.length);
     if (pathname === "/price") {
       priceWs.handleUpgrade(req, socket, head, (ws) => {
         priceCom.addSocket(productId, ws);
@@ -58,6 +60,10 @@ server.on("upgrade", (req, socket, head) => {
         cartWs.emit("connection", ws, req);
       });
     }
+  } else if (pathname.startsWith(CLIENTS_SOCKET_PATH)) {
+    clientWs.handleUpgrade(req, socket, head, (ws) => {
+      clientWs.emit("connection", ws, req);
+    });
   }
 });
 
