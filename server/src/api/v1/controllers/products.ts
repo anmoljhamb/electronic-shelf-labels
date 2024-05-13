@@ -1,59 +1,24 @@
-import { Request, Response } from "express";
-import createHttpError from "http-errors";
-import { protectedFunc } from "../../utils/protectedFunc";
 import { Products } from "../schemas/products";
-import { IProduct } from "../types";
 
-export const fetchAllProducts = protectedFunc(
-  async (_req: Request, res: Response) => {
-    const products = await Products.find({});
-    res.status(200).json(products);
-  },
-);
+export const fetchAllProducts = async () => {
+  return await Products.find({});
+};
 
-export const createNewProduct = protectedFunc(
-  async (req: Request, res: Response) => {
-    const product = new Products({ ...req.body });
-    await product.save();
-    res.status(200).json({ msg: "Create new Product", product });
-  },
-);
+export const fetchProductById = async (productId: string) => {
+  return await Products.findOne({ productId });
+};
 
-export const fetchProductById = protectedFunc(
-  async (req: Request, res: Response) => {
-    const { productId } = req.params;
-    const product = await Products.findOne({ productId });
-    if (!product)
-      throw new createHttpError.NotFound("The given productId was not found.");
-    res
-      .status(200)
-      .json({ msg: "Fetch Product by Id", deletedProduct: product });
-  },
-);
+export const createNewProduct = async (body: any) => {
+  const product = new Products({ ...body });
+  return await product.save();
+};
 
-export const updateProductById = protectedFunc(
-  async (req: Request, res: Response) => {
-    const { productId } = req.params;
-    const body = req.body as Partial<IProduct>;
-    const product = await Products.findOneAndUpdate({ productId }, body, {
-      new: true,
-    });
-    if (!product)
-      throw new createHttpError.NotFound(
-        "Product with the given productId was not found",
-      );
-    res
-      .status(200)
-      .json({ msg: "Modify Product by Id", modifiedProduct: product });
-  },
-);
+export const deleteProductById = async (productId: string) => {
+  return await Products.findOneAndDelete({ productId });
+};
 
-export const deleteProductById = protectedFunc(async (req, res) => {
-  const { productId } = req.params;
-  const product = await Products.findOneAndDelete({ productId });
-  if (!product)
-    throw new createHttpError.NotFound("The given productId was not found.");
-  res
-    .status(200)
-    .json({ msg: "Delete Product by Id", deletedProduct: product });
-});
+export const updateProductById = async (productId: string, body: any) => {
+  return await Products.findOneAndUpdate({ productId }, body, {
+    new: true,
+  });
+};

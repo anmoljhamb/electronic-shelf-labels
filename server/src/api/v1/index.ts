@@ -1,5 +1,6 @@
 import * as express from "express";
 import { productRouter } from "./routes/products";
+import { cartRouter } from "./routes/carts";
 
 export const apiRouter = express.Router();
 
@@ -8,3 +9,4 @@ apiRouter.get("/", (_req, res) => {
 });
 
 apiRouter.use("/products", productRouter);
+apiRouter.use("/carts", cartRouter);
