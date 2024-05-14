@@ -11,6 +11,7 @@ import createHttpError from "http-errors";
 import { IProduct } from "../types";
 import { getAllUsers } from "../controllers/carts";
 import { clients } from "../sockets/client";
+import { updateData } from "../../utils/updateData";
 
 export const productRouter = Router();
 
@@ -63,10 +64,7 @@ productRouter
       const { productId } = req.params;
       const body = req.body as Partial<IProduct>;
       const product = await updateProductById(productId, body);
-      const users = await getAllUsers();
-      clients.forEach((client) => {
-        client.send(JSON.stringify(users));
-      });
+      updateData();
       if (!product)
         throw new createHttpError.NotFound(
           "Product with the given productId was not found",

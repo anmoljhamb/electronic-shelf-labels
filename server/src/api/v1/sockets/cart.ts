@@ -5,6 +5,7 @@ import { TAKE_LIMIT, LOWER_LIMIT } from "../constants";
 import { Carts } from "../schemas/carts";
 import { getAllUsers } from "../controllers/carts";
 import { clients } from "./client";
+import { updateData } from "../../utils/updateData";
 
 export const cartWs = new ws.WebSocketServer({ noServer: true });
 export const cartCom = new Communication();
@@ -36,10 +37,7 @@ cartWs.on("connection", async (socket, req) => {
     }
 
     try {
-      const users = await getAllUsers();
-      clients.forEach((client) => {
-        client.send(JSON.stringify(users));
-      });
+      updateData();
     } catch (err) {
       console.log(err);
     }
