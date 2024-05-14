@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
 import express, { NextFunction, Request, Response } from "express";
+import cors from "cors";
 import { createServer } from "http";
 import createHttpError from "http-errors";
 import { ReasonPhrases } from "http-status-codes";
@@ -25,6 +26,7 @@ const CLIENTS_SOCKET_PATH = "/api/v1/clients/sockets";
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(cors({ origin: "*" }));
 
 app.use("/api/v1", apiRouter);
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { backendUri } from "../constants";
+import { socketBackendUri } from "../constants";
 import { OrderDetail } from "../types";
 import SideDrawer from "../components/SideDrawer";
 import { ImageBg } from "../components/ImageBg";
@@ -19,7 +19,7 @@ function CartsPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    socket = new WebSocket(backendUri);
+    socket = new WebSocket(socketBackendUri);
 
     socket.onopen = () => {
       console.log("Connected to WebSocket server");
@@ -34,7 +34,7 @@ function CartsPage() {
 
     socket.onclose = () => {
       console.log("Disconnected from WebSocket server");
-      socket = new WebSocket(backendUri);
+      socket = new WebSocket(socketBackendUri);
     };
 
     return () => {
@@ -80,7 +80,7 @@ function CartsPage() {
                     <td className="border border-black p-2 text-center">
                       <Button
                         onClick={() => {
-                          const url = `/view/submission?uid=${submission.uid}`;
+                          const url = `/view/carts?userId=${cart.userId}`;
                           navigate(url);
                         }}
                       >

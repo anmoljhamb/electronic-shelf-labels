@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import NotFoundPage from "./pages/NotFoundPage";
 import CartsPage from "./pages/CartsPage";
 import ProductsPage from "./pages/ProductsPage";
+import ViewCart from "./pages/ViewCart";
 
 function App() {
   return (
@@ -9,6 +10,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Navigate to={"/carts"} />} />
         <Route path="/carts" element={<CartsPage />} />
+        <Route path="/view/carts" element={<ViewCart />} />
         <Route path="/products" element={<ProductsPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
