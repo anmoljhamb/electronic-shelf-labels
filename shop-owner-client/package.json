@@ -16,11 +16,13 @@
     "@mui/icons-material": "^5.15.17",
     "@mui/material": "^5.15.17",
     "axios": "^1.6.8",
+    "formik": "^2.4.6",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.23.1",
     "socket.io-client": "^4.7.5",
-    "ws": "^8.17.0"
+    "ws": "^8.17.0",
+    "yup": "^1.4.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.66",

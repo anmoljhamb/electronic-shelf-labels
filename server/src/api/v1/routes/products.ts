@@ -9,8 +9,6 @@ import {
 import { protectedFunc } from "../../utils/protectedFunc";
 import createHttpError from "http-errors";
 import { IProduct } from "../types";
-import { getAllUsers } from "../controllers/carts";
-import { clients } from "../sockets/client";
 import { updateData } from "../../utils/updateData";
 
 export const productRouter = Router();
@@ -27,14 +25,12 @@ productRouter
     "/:productId",
     protectedFunc(async (req: Request, res: Response) => {
       const { productId } = req.params;
-      const product = fetchProductById(productId);
+      const product = await fetchProductById(productId);
       if (!product)
         throw new createHttpError.NotFound(
           "The given productId was not found.",
         );
-      res
-        .status(200)
-        .json({ msg: "Fetch Product by Id", deletedProduct: product });
+      res.status(200).json({ msg: "Fetch Product by Id", product });
     }),
   )
   .post(
