@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import LoadingPage from "./LoadingPage";
 import NotFoundPage from "./NotFoundPage";
 import { ImageBg } from "../components/ImageBg";
-import { Divider, Typography } from "@mui/material";
+import { Button, Divider, Typography } from "@mui/material";
 import axios from "axios";
 import { apiUri } from "../constants";
 import { OrderDetail } from "../types";
@@ -100,6 +100,13 @@ const ViewCart = () => {
               );
             })}
           </table>
+          <Button
+            className="my-4 w-full"
+            variant="contained"
+            onClick={() => {}}
+          >
+            Checkout
+          </Button>
         </div>
       </section>
     </>

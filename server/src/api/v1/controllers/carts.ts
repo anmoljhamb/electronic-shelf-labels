@@ -54,3 +54,8 @@ export const fetchUserTotalAndOrderDetails = async (userId: string) => {
   console.log(total);
   return { total, orderDetails, userId };
 };
+
+export const emptyCart = async (userId: string) => {
+  console.log(userId);
+  return await Carts.deleteMany({ userId });
+};
