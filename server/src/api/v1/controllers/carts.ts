@@ -2,6 +2,18 @@ import { Carts } from "../schemas/carts";
 import { IProduct, OrderDetail } from "../types";
 import { fetchProductById } from "./products";
 
+export const getAllUsers = async () => {
+  const carts = await Carts.find({});
+  const userIds = new Set<string>();
+  carts.forEach((cart) => {
+    userIds.add(cart.userId as string);
+  });
+  const users = Array.from(userIds);
+  const promises = users.map((user) => fetchUserTotalAndOrderDetails(user));
+  const resp = await Promise.all(promises);
+  return resp;
+};
+
 export const fetchUserTotalAndOrderDetails = async (userId: string) => {
   const uniqueProductIds = new Set<string>();
   const carts = await Carts.find({ userId });
@@ -40,5 +52,5 @@ export const fetchUserTotalAndOrderDetails = async (userId: string) => {
     total += product.price;
   });
   console.log(total);
-  return { total, orderDetails };
+  return { total, orderDetails, userId };
 };

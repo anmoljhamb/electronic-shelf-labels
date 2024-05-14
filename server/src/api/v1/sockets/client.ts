@@ -1,4 +1,5 @@
 import ws from "ws";
+import { getAllUsers } from "../controllers/carts";
 
 export const clientWs = new ws.WebSocketServer({ noServer: true });
 export const clients: ws[] = [];
@@ -20,4 +21,12 @@ clientWs.on("connection", async (socket, _req) => {
   socket.on("unexpected-response", (resp) => {
     console.log(resp);
   });
+
+  try {
+    const users = await getAllUsers();
+    console.log("sending", JSON.stringify(users));
+    socket.send(JSON.stringify(users));
+  } catch (err) {
+    console.log(err);
+  }
 });
