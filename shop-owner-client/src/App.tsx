@@ -42,6 +42,7 @@ function App() {
 
   return (
     <>
+      {carts.length === 0 && <h1>No carts present</h1>}
       {carts.map((cart, index) => {
         return (
           <div key={index}>

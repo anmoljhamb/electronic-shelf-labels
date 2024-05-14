@@ -3,6 +3,8 @@ import { Communication } from "../../utils/communication";
 import { RFIDResponse } from "../types";
 import { TAKE_LIMIT, LOWER_LIMIT } from "../constants";
 import { Carts } from "../schemas/carts";
+import { getAllUsers } from "../controllers/carts";
+import { clients } from "./client";
 
 export const cartWs = new ws.WebSocketServer({ noServer: true });
 export const cartCom = new Communication();
@@ -18,7 +20,10 @@ cartWs.on("connection", async (socket, req) => {
     console.log("recieved data:", data);
     if (data.duration <= LOWER_LIMIT) {
       socket.send("IGNORE");
-    } else if (data.duration <= TAKE_LIMIT) {
+      return;
+    }
+
+    if (data.duration <= TAKE_LIMIT) {
       const cart = new Carts({ productId, userId: data.uid });
       await cart.save();
       socket.send("TAKE");
@@ -28,6 +33,15 @@ cartWs.on("connection", async (socket, req) => {
         userId: data.uid,
       });
       socket.send("REMOVE");
+    }
+
+    try {
+      const users = await getAllUsers();
+      clients.forEach((client) => {
+        client.send(JSON.stringify(users));
+      });
+    } catch (err) {
+      console.log(err);
     }
   });
 
