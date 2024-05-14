@@ -9,3 +9,9 @@ export type OrderDetail = {
   item: IProduct;
   qty: number;
 };
+
+export type ICart = {
+  total: number;
+  orderDetails: Record<string, OrderDetail>;
+  userId: string;
+};

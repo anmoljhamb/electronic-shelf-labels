@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import LoadingPage from "./LoadingPage";
 import NotFoundPage from "./NotFoundPage";
@@ -6,47 +6,41 @@ import { ImageBg } from "../components/ImageBg";
 import { Button, Divider, Typography } from "@mui/material";
 import axios from "axios";
 import { apiUri } from "../constants";
-import { OrderDetail } from "../types";
+import { CartContext } from "../contexts/CartContext";
 
 const ViewCart = () => {
   const params = useLocation();
+  const { carts } = useContext(CartContext)!;
+
   const uid: string = new URLSearchParams(params.search).get(
     "userId",
   ) as string;
 
-  const [loading, setloading] = useState(false);
-  const [cart, setCart] = useState<{
-    total: number;
-    orderDetails: Record<string, OrderDetail>;
-    userId: string;
-  } | null>(null);
-
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const fetch = async () => {
-      setloading(true);
-      try {
-        const resp = await axios.get(`${apiUri}/carts/${uid}`);
-        console.log(resp.data);
-        setCart({ ...resp.data, userId: uid });
-      } catch (err) {
-        console.log(err);
-      } finally {
-        setloading(false);
-      }
-    };
-
-    fetch();
-  }, [uid]);
 
   if (loading) {
     return <LoadingPage />;
   }
 
-  if (cart === null) {
+  if (!(uid in carts)) {
     return <NotFoundPage />;
   }
+
+  const cart = carts[uid];
+
+  const emptyCart = async () => {
+    setLoading(true);
+    try {
+      const resp = await axios.get(`${apiUri}/carts/empty-cart/${uid}`);
+      console.log(resp);
+      navigate("/carts");
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <>
@@ -76,34 +70,37 @@ const ViewCart = () => {
                 </th>
               </tr>
             </thead>
-            {Object.keys(cart.orderDetails).map((key, index) => {
-              return (
-                <tr key={key}>
-                  <td className="border border-black p-2 text-center">
-                    {index + 1}
-                  </td>
-                  <td className="border border-black p-2 text-center">
-                    {cart.orderDetails[key].item.title}
-                  </td>
-                  <td className="border border-black p-2 text-center">
-                    ${cart.orderDetails[key].item.price}
-                  </td>
-                  <td className="border border-black p-2 text-center">
-                    {cart.orderDetails[key].qty}
-                  </td>
-                  <td className="border border-black p-2 text-center">
-                    $
-                    {cart.orderDetails[key].qty *
-                      cart.orderDetails[key].item.price}
-                  </td>
-                </tr>
-              );
-            })}
+            <tbody>
+              {Object.keys(cart.orderDetails).map((key, index) => {
+                return (
+                  <tr key={key}>
+                    <td className="border border-black p-2 text-center">
+                      {index + 1}
+                    </td>
+                    <td className="border border-black p-2 text-center">
+                      {cart.orderDetails[key].item.title}
+                    </td>
+                    <td className="border border-black p-2 text-center">
+                      ${cart.orderDetails[key].item.price}
+                    </td>
+                    <td className="border border-black p-2 text-center">
+                      {cart.orderDetails[key].qty}
+                    </td>
+                    <td className="border border-black p-2 text-center">
+                      $
+                      {cart.orderDetails[key].qty *
+                        cart.orderDetails[key].item.price}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
           </table>
           <Button
             className="my-4 w-full"
             variant="contained"
-            onClick={() => {}}
+            onClick={emptyCart}
+            disabled={loading}
           >
             Checkout
           </Button>

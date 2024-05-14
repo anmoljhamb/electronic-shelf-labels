@@ -1,49 +1,13 @@
-import { useEffect, useState } from "react";
-import { socketBackendUri } from "../constants";
-import { OrderDetail } from "../types";
 import SideDrawer from "../components/SideDrawer";
 import { ImageBg } from "../components/ImageBg";
 import { Button, Divider, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import { CartContext } from "../contexts/CartContext";
 
 function CartsPage() {
-  const [messages, setMessages] = useState<string[]>([]);
-  let socket: WebSocket | null = null;
-  const [carts, setCarts] = useState<
-    Array<{
-      total: number;
-      orderDetails: Record<string, OrderDetail>;
-      userId: string;
-    }>
-  >([]);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    socket = new WebSocket(socketBackendUri);
-
-    socket.onopen = () => {
-      console.log("Connected to WebSocket server");
-    };
-
-    socket.onmessage = (event) => {
-      console.log(event.data);
-      setCarts(JSON.parse(event.data));
-      setMessages((prevMessages) => [...prevMessages, event.data]);
-      console.log(JSON.parse(event.data));
-    };
-
-    socket.onclose = () => {
-      console.log("Disconnected from WebSocket server");
-      socket = new WebSocket(socketBackendUri);
-    };
-
-    return () => {
-      // Clean up the WebSocket connection when component unmounts
-      if (socket) {
-        socket.close();
-      }
-    };
-  }, []);
+  const { carts } = useContext(CartContext)!;
 
   return (
     <>
@@ -65,7 +29,8 @@ function CartsPage() {
               </tr>
             </thead>
             <tbody>
-              {carts.map((cart, index) => {
+              {Object.keys(carts).map((key, index) => {
+                const cart = carts[key];
                 return (
                   <tr key={cart.userId}>
                     <td className="border border-black p-2 text-center">
@@ -75,7 +40,7 @@ function CartsPage() {
                       {cart.userId}
                     </td>
                     <td className="border border-black p-2 text-center">
-                      {cart.total}
+                      ${cart.total}
                     </td>
                     <td className="border border-black p-2 text-center">
                       <Button
@@ -92,7 +57,7 @@ function CartsPage() {
               })}
             </tbody>
           </table>
-          {carts.length === 0 && <h1>No carts present</h1>}
+          {Object.keys(carts).length === 0 && <h1>No carts present</h1>}
         </div>
       </section>
     </>
